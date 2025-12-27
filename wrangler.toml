@@ -10,3 +10,6 @@ database_id = "a771f874-6bc7-4c78-b2a5-b881581f5810"
 
 [vars]
 JWT_SECRET = "super-secret-jwt-key-change-me"
+
+[site]
+bucket = "./public"

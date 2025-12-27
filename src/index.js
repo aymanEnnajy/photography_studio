@@ -4,16 +4,18 @@ import { sign } from 'jsonwebtoken'
 import { hash, compare } from 'bcryptjs'
 import { authMiddleware } from './middleware/auth'
 
+import { serveStatic } from 'hono/cloudflare-workers'
+
 const app = new Hono()
 
 app.use('/*', cors())
 
+// Serve static files
+app.get('/*', serveStatic({ root: './' }))
+app.get('/', serveStatic({ path: './index.html' }))
+
 // Auth key for JWT
 const getJwtSecret = (c) => c.env.JWT_SECRET
-
-app.get('/', (c) => {
-    return c.text('Hello Cloudflare Workers + D1! The backend is running.')
-})
 
 app.get('/health', (c) => {
     return c.json({ status: 'ok', timestamp: new Date().toISOString() })
