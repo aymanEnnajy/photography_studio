@@ -411,7 +411,7 @@ app.get('/api/items/:id/reviews', async (c) => {
 });
 
 // Serve static files (Fallback)
-app.get('/*', serveStatic({ root: './', manifest }))
-app.get('/', serveStatic({ path: './index.html', manifest }))
+app.get('/*', serveStatic({ root: '', manifest }))
+app.get('/', serveStatic({ path: 'index.html', manifest }))
 
 export default app
