@@ -413,18 +413,22 @@ app.get('/api/items/:id/reviews', async (c) => {
 // Serve static files
 app.get('/css/*', serveStatic({ manifest }))
 app.get('/js/*', serveStatic({ manifest }))
-app.get('/assets/*', serveStatic({ manifest }))
-app.get('/favicon.ico', serveStatic({ manifest }))
 
-// Serve HTML files
+// Specific HTML routes to ensure correct mapping
+const htmlFiles = [
+    'index.html', 'studios.html', 'studio-detail.html',
+    'login.html', 'register.html', 'favorites.html',
+    'add-studio.html', 'my-bookings.html'
+]
+
+htmlFiles.forEach(file => {
+    app.get(`/${file}`, serveStatic({ path: file, manifest }))
+})
+
+// Root redirect/serve for index.html
 app.get('/', serveStatic({ path: 'index.html', manifest }))
-app.get('/index.html', serveStatic({ path: 'index.html', manifest }))
-app.get('/studios.html', serveStatic({ path: 'studios.html', manifest }))
-app.get('/studio-detail.html', serveStatic({ path: 'studio-detail.html', manifest }))
-app.get('/login.html', serveStatic({ path: 'login.html', manifest }))
-app.get('/register.html', serveStatic({ path: 'register.html', manifest }))
-app.get('/favorites.html', serveStatic({ path: 'favorites.html', manifest }))
-app.get('/add-studio.html', serveStatic({ path: 'add-studio.html', manifest }))
-app.get('/my-bookings.html', serveStatic({ path: 'my-bookings.html', manifest }))
+
+// Catch-all static (ONLY if it hasn't matched any API or specific route)
+app.get('*', serveStatic({ manifest }))
 
 export default app

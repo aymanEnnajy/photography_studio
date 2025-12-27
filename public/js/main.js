@@ -8,7 +8,7 @@
 // ========================================
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:8787/api'
-    : 'https://photography-studio-backend.aymanennajy.workers.dev/api'; // Replace with your actual worker subdomain if different
+    : '/api'; // Use relative path since we serve from the same worker
 
 const API = {
     async request(endpoint, method = 'GET', body = null) {
@@ -159,6 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initAnimations();
     initFavorites();
     initLogout();
+    initFeaturedStudios();
     hideLoadingScreen();
 });
 
@@ -512,6 +513,70 @@ function debounce(func, wait) {
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
     };
+}
+
+// ========================================
+// Featured Studios (Home Page)
+// ========================================
+async function initFeaturedStudios() {
+    const grid = document.getElementById('featuredStudiosGrid');
+    if (!grid) return;
+
+    try {
+        const studios = await API.get('/items');
+        // Take first 3 for featured
+        const featured = studios.slice(0, 3);
+
+        if (featured.length === 0) {
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">Aucun studio disponible pour le moment.</p>';
+            return;
+        }
+
+        grid.innerHTML = featured.map((studio, index) => `
+            <div class="studio-card" data-aos="fade-up" data-aos-delay="${(index + 1) * 100}">
+                <div class="studio-card-image">
+                    <div class="studio-badge ${studio.status}">${studio.status === 'available' ? 'Disponible' : 'Réservé'}</div>
+                    <button class="favorite-btn" data-studio-id="${studio.id}">
+                        <i class="${AppState.isFavorite(studio.id) ? 'fas' : 'far'} fa-heart"></i>
+                    </button>
+                    ${studio.image ? `<img src="${studio.image}" alt="${studio.name}" style="width: 100%; height: 100%; object-fit: cover;">` : `
+                    <div class="image-placeholder">
+                        <i class="fas fa-image"></i>
+                    </div>`}
+                </div>
+                <div class="studio-card-content">
+                    <div class="studio-header">
+                        <h3 class="studio-name">${studio.name}</h3>
+                        <div class="studio-rating">
+                            <i class="fas fa-star"></i>
+                            <span>${studio.average_rating || 'N/A'}</span>
+                        </div>
+                    </div>
+                    <div class="studio-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${studio.city}</span>
+                    </div>
+                    <div class="studio-services">
+                        ${(studio.services || '').split(',').map(s => `<span class="service-tag">${s.trim()}</span>`).join('')}
+                    </div>
+                    <div class="studio-footer">
+                        <div class="studio-price">
+                            <span class="price-amount">${studio.price_per_hour}€</span>
+                            <span class="price-unit">/heure</span>
+                        </div>
+                        <a href="studio-detail.html?id=${studio.id}" class="btn btn-primary btn-sm">
+                            Voir Détails
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        // Re-init favorites for these new buttons
+        initFavorites();
+    } catch (error) {
+        console.error('Error loading featured studios:', error);
+    }
 }
 
 // Export for use in other scripts

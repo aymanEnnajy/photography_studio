@@ -31,20 +31,10 @@ function initLoginForm() {
         errorAlert.style.display = 'none';
 
         try {
-            // Simulate API call
-            await simulateLogin(email, password);
-
-            // Mock user data
-            const user = {
-                id: '1',
-                username: email.split('@')[0],
-                email: email
-            };
-
-            const token = 'mock_jwt_token_' + Date.now();
+            const data = await API.post('/auth/login', { email, password });
 
             // Save to AppState
-            window.AppState.saveUser(user, token);
+            window.AppState.saveUser(data.user, data.token);
 
             // Show success
             window.showNotification('Connexion réussie !', 'success');
@@ -116,28 +106,15 @@ function initRegisterForm() {
         errorAlert.style.display = 'none';
 
         try {
-            // Simulate API call
-            await simulateRegister(username, email, password);
-
-            // Mock user data
-            const user = {
-                id: '1',
-                username: username,
-                email: email
-            };
-
-            const token = 'mock_jwt_token_' + Date.now();
-
-            // Save to AppState
-            window.AppState.saveUser(user, token);
+            await API.post('/auth/register', { username, email, password });
 
             // Show success
-            window.showNotification('Compte créé avec succès !', 'success');
+            window.showNotification('Compte créé avec succès ! Connectez-vous maintenant.', 'success');
 
-            // Redirect
+            // Redirect to login
             setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1000);
+                window.location.href = 'login.html';
+            }, 1500);
 
         } catch (error) {
             errorMessage.textContent = error.message;
