@@ -38,11 +38,12 @@ async function loadStudioDetails() {
         // Check if user owns this studio
         checkStudioOwnership(studio);
     } catch (error) {
-        console.error(error);
-        window.showNotification('Studio introuvable', 'error');
+        console.error('Error loading studio details:', error);
+        console.log('Attempted ID:', studioId);
+        window.showNotification(`Studio introuvable (ID: ${studioId})`, 'error');
         setTimeout(() => {
             window.location.href = 'studios.html';
-        }, 2000);
+        }, 3000);
     }
 }
 

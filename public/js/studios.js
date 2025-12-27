@@ -382,7 +382,7 @@ function createStudioCard(studio, index) {
     return card;
 }
 
-function toggleFavorite(btn, studioId) {
+async function toggleFavorite(btn, studioId) {
     if (!window.AppState.isAuthenticated) {
         window.showNotification('Veuillez vous connecter pour ajouter aux favoris', 'warning');
         setTimeout(() => {
@@ -394,23 +394,35 @@ function toggleFavorite(btn, studioId) {
     const icon = btn.querySelector('i');
     const isCurrentlyFavorite = window.AppState.isFavorite(studioId);
 
+    btn.disabled = true;
+
     if (isCurrentlyFavorite) {
-        window.AppState.removeFavorite(studioId);
-        btn.classList.remove('active');
-        if (icon) {
-            icon.classList.remove('fas');
-            icon.classList.add('far');
+        const success = await window.AppState.removeFavorite(studioId);
+        if (success) {
+            btn.classList.remove('active');
+            if (icon) {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+            }
+            window.showNotification('Retiré des favoris', 'success');
+        } else {
+            window.showNotification('Erreur lors du retrait des favoris', 'error');
         }
-        window.showNotification('Retiré des favoris', 'success');
     } else {
-        window.AppState.addFavorite(studioId);
-        btn.classList.add('active');
-        if (icon) {
-            icon.classList.remove('far');
-            icon.classList.add('fas');
+        const success = await window.AppState.addFavorite(studioId);
+        if (success) {
+            btn.classList.add('active');
+            if (icon) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+            }
+            window.showNotification('Ajouté aux favoris', 'success');
+        } else {
+            window.showNotification('Erreur lors de l\'ajout aux favoris', 'error');
         }
-        window.showNotification('Ajouté aux favoris', 'success');
     }
+
+    btn.disabled = false;
 }
 
 // Initialize pagination

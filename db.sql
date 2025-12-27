@@ -38,7 +38,6 @@ CREATE TABLE favorites (
     UNIQUE(user_id, studio_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (studio_id) REFERENCES studios(id) ON DELETE CASCADE
-    FOREIGN KEY (studio_id) REFERENCES studios(id) ON DELETE CASCADE
 );
 
 CREATE TABLE bookings (

@@ -110,16 +110,31 @@ const AppState = {
         window.location.href = 'index.html';
     },
 
-    addFavorite(studioId) {
+    async addFavorite(studioId) {
         if (!this.favorites.includes(studioId)) {
-            this.favorites.push(studioId);
-            localStorage.setItem('favorites', JSON.stringify(this.favorites));
+            try {
+                await API.post(`/favorites/${studioId}`);
+                this.favorites.push(studioId);
+                localStorage.setItem('favorites', JSON.stringify(this.favorites));
+                return true;
+            } catch (e) {
+                console.error('Failed to add favorite to backend:', e);
+                return false;
+            }
         }
+        return true;
     },
 
-    removeFavorite(studioId) {
-        this.favorites = this.favorites.filter(id => id !== studioId);
-        localStorage.setItem('favorites', JSON.stringify(this.favorites));
+    async removeFavorite(studioId) {
+        try {
+            await API.delete(`/favorites/${studioId}`);
+            this.favorites = this.favorites.filter(id => id !== studioId);
+            localStorage.setItem('favorites', JSON.stringify(this.favorites));
+            return true;
+        } catch (e) {
+            console.error('Failed to remove favorite from backend:', e);
+            return false;
+        }
     },
 
     isFavorite(studioId) {
@@ -328,7 +343,7 @@ function initFavorites() {
     });
 }
 
-function toggleFavorite(btn, studioId) {
+async function toggleFavorite(btn, studioId) {
     if (!AppState.isAuthenticated) {
         showNotification('Veuillez vous connecter pour ajouter aux favoris', 'warning');
         setTimeout(() => {
@@ -340,25 +355,37 @@ function toggleFavorite(btn, studioId) {
     const icon = btn.querySelector('i');
     const isCurrentlyFavorite = AppState.isFavorite(studioId);
 
+    btn.disabled = true; // Prevent double click
+
     if (isCurrentlyFavorite) {
         // Remove from favorites
-        AppState.removeFavorite(studioId);
-        btn.classList.remove('active');
-        if (icon) {
-            icon.classList.remove('fas');
-            icon.classList.add('far');
+        const success = await AppState.removeFavorite(studioId);
+        if (success) {
+            btn.classList.remove('active');
+            if (icon) {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+            }
+            showNotification('Retiré des favoris', 'success');
+        } else {
+            showNotification('Erreur lors du retrait des favoris', 'error');
         }
-        showNotification('Retiré des favoris', 'success');
     } else {
         // Add to favorites
-        AppState.addFavorite(studioId);
-        btn.classList.add('active');
-        if (icon) {
-            icon.classList.remove('far');
-            icon.classList.add('fas');
+        const success = await AppState.addFavorite(studioId);
+        if (success) {
+            btn.classList.add('active');
+            if (icon) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+            }
+            showNotification('Ajouté aux favoris', 'success');
+        } else {
+            showNotification('Erreur lors de l\'ajout aux favoris', 'error');
         }
-        showNotification('Ajouté aux favoris', 'success');
     }
+
+    btn.disabled = false;
 }
 
 // ========================================

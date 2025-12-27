@@ -156,18 +156,24 @@ function initializeFavoriteButtons() {
     const favoriteButtons = document.querySelectorAll('.favorite-btn');
 
     favoriteButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', async (e) => {
             e.preventDefault();
             e.stopPropagation();
 
             const studioId = btn.dataset.studioId;
-            window.AppState.removeFavorite(studioId);
-            window.showNotification('Retiré des favoris', 'success');
+            btn.disabled = true;
 
-            // Reload favorites
-            setTimeout(() => {
-                loadFavorites();
-            }, 300);
+            const success = await window.AppState.removeFavorite(studioId);
+            if (success) {
+                window.showNotification('Retiré des favoris', 'success');
+                // Reload favorites
+                setTimeout(() => {
+                    loadFavorites();
+                }, 300);
+            } else {
+                window.showNotification('Erreur lors du retrait des favoris', 'error');
+                btn.disabled = false;
+            }
         });
     });
 }
