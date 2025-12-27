@@ -9,11 +9,12 @@ import manifest from '__STATIC_CONTENT_MANIFEST'
 
 const app = new Hono()
 
-app.use('/*', cors())
+app.onError((err, c) => {
+    console.error('Runtime Error:', err)
+    return c.text(`Internal Server Error: ${err.message}\n${err.stack}`, 500)
+})
 
-// Serve static files
-app.get('/*', serveStatic({ root: './', manifest }))
-app.get('/', serveStatic({ path: './index.html', manifest }))
+app.use('/*', cors())
 
 // Auth key for JWT
 const getJwtSecret = (c) => c.env.JWT_SECRET
@@ -408,5 +409,9 @@ app.get('/api/items/:id/reviews', async (c) => {
         return c.json({ error: 'Failed to fetch reviews' }, 500);
     }
 });
+
+// Serve static files (Fallback)
+app.get('/*', serveStatic({ root: './', manifest }))
+app.get('/', serveStatic({ path: './index.html', manifest }))
 
 export default app
