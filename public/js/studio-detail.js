@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadStudioDetails() {
     // Get studio ID from URL
     const urlParams = new URLSearchParams(window.location.search);
-    const studioId = urlParams.get('id');
+    const studioId = urlParams.get('id')?.trim();
 
     if (!studioId) {
         window.location.href = 'studios.html';

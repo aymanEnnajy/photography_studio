@@ -161,13 +161,37 @@ app.get('/api/items', async (c) => {
 
 // Get Studio Details
 app.get('/api/items/:id', async (c) => {
-    const id = c.req.param('id');
-    const studio = await c.env.DB.prepare('SELECT * FROM studios WHERE id = ?').bind(id).first();
+    const id = c.req.param('id')?.trim();
+    console.log(`[API] Fetching studio detail for ID: "${id}"`);
 
-    if (!studio) {
-        return c.json({ error: 'Studio not found' }, 404);
+    if (!id) {
+        return c.json({ error: 'ID is required' }, 400);
     }
-    return c.json(studio);
+
+    try {
+        // Try both string and number for ID to be safe
+        const numericId = parseInt(id);
+        let studio;
+
+        if (!isNaN(numericId)) {
+            studio = await c.env.DB.prepare('SELECT * FROM studios WHERE id = ?').bind(numericId).first();
+        }
+
+        if (!studio) {
+            studio = await c.env.DB.prepare('SELECT * FROM studios WHERE id = ?').bind(id).first();
+        }
+
+        if (!studio) {
+            console.warn(`[API] Studio with ID "${id}" not found in database`);
+            return c.json({ error: 'Studio not found' }, 404);
+        }
+
+        console.log(`[API] Studio found: ${studio.name}`);
+        return c.json(studio);
+    } catch (e) {
+        console.error(`[API] Error fetching studio ID "${id}":`, e.message);
+        return c.json({ error: 'Failed to fetch studio', details: e.message }, 500);
+    }
 });
 
 // Create Studio (Protected)
