@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Dashboard - PhotoStudio Hub</title>
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-camera-retro"></i>
+                    <span>PhotoStudio<span class="accent">Hub</span></span>
+                </a>
+
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="index.html" class="nav-link">Accueil</a></li>
+                    <li><a href="studios.html" class="nav-link">Studios</a></li>
+                    <li><a href="favorites.html" class="nav-link">Favoris</a></li>
+                    <li class="nav-profile" id="navProfile">
+                        <div class="profile-dropdown">
+                            <button class="profile-btn" id="profileBtn">
+                                <i class="fas fa-user-circle"></i>
+                                <span id="usernameDisplay">Chargement...</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-menu" id="profileDropdown">
+                                <a href="dashboard.html" class="active"><i class="fas fa-tachometer-alt"></i>
+                                    Dashboard</a>
+                                <a href="add-studio.html"><i class="fas fa-plus-circle"></i> Ajouter Studio</a>
+                                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="dashboard-page">
+        <div class="container">
+            <header class="page-header" data-aos="fade-up">
+                <div class="header-content">
+                    <h1 class="page-title">Mon Dashboard</h1>
+                    <p class="page-description">Gérez vos studios et vos réservations</p>
+                </div>
+                <div class="header-actions">
+                    <a href="add-studio.html" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nouveau Studio
+                    </a>
+                </div>
+            </header>
+
+            <div class="dashboard-stats" data-aos="fade-up" data-aos-delay="100">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-camera"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="totalStudios">0</span>
+                        <span class="stat-label">Mes Studios</span>
+                    </div>
+                </div>
+                <!-- Future stats could go here -->
+            </div>
+
+            <section class="my-studios-section" data-aos="fade-up" data-aos-delay="200">
+                <div class="section-header">
+                    <h2 class="section-title">Mes Studios</h2>
+                </div>
+
+                <div class="dashboard-grid" id="myStudiosGrid">
+                    <!-- Loading state -->
+                    <div class="loading-placeholder">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Chargement de vos studios...</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2024 PhotoStudio Hub. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom JS -->
+    <script src="js/main.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>

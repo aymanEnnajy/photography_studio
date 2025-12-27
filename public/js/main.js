@@ -485,11 +485,11 @@ document.head.appendChild(style);
 
 // Format price
 function formatPrice(price) {
-    return new Intl.NumberFormat('fr-FR', {
+    return new Intl.NumberFormat('fr-MA', {
         style: 'currency',
-        currency: 'EUR',
+        currency: 'MAD',
         minimumFractionDigits: 0
-    }).format(price);
+    }).format(price).replace('MAD', 'DH').trim();
 }
 
 // Format date

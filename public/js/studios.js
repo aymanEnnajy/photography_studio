@@ -62,7 +62,7 @@ function initFilters() {
     // Price range
     if (priceRange && minPrice && maxPrice) {
         priceRange.addEventListener('input', (e) => {
-            maxPrice.textContent = `${e.target.value}€`;
+            maxPrice.textContent = `${e.target.value} DH`;
         });
     }
 
@@ -119,7 +119,7 @@ function applyFilters() {
     const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
     const selectedServices = Array.from(document.querySelectorAll('input[name="service"]:checked')).map(cb => cb.value);
     const selectedStatus = document.querySelector('input[name="status"]:checked')?.value || 'all';
-    const maxPriceValue = parseInt(document.getElementById('priceRange')?.value || 300);
+    const maxPriceValue = parseInt(document.getElementById('priceRange')?.value || 3000);
     const selectedCity = document.getElementById('cityFilter')?.value || '';
     const selectedEquipment = Array.from(document.querySelectorAll('input[name="equipment"]:checked')).map(cb => cb.value);
 
@@ -194,8 +194,8 @@ function resetFilters() {
     document.getElementById('searchInput').value = '';
     document.querySelectorAll('input[name="service"]').forEach(cb => cb.checked = false);
     document.querySelector('input[name="status"][value="all"]').checked = true;
-    document.getElementById('priceRange').value = 300;
-    document.getElementById('maxPrice').textContent = '300€';
+    document.getElementById('priceRange').value = 3000;
+    document.getElementById('maxPrice').textContent = '3000 DH';
     document.getElementById('cityFilter').value = '';
     document.querySelectorAll('input[name="equipment"]').forEach(cb => cb.checked = false);
 
@@ -339,7 +339,7 @@ function createStudioCard(studio, index) {
             </div>
             <div class="studio-footer">
                 <div class="studio-price">
-                    <span class="price-amount">${studio.price}€</span>
+                    <span class="price-amount">${studio.price} DH</span>
                     <span class="price-unit">/heure</span>
                 </div>
                 <a href="studio-detail.html?id=${studio.id}" class="btn btn-primary btn-sm">

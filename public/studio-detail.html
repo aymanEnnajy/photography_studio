@@ -1,20 +1,24 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Détails du studio photo">
     <title>Détails Studio - PhotoStudio Hub</title>
-    
+
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
-    
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar" id="navbar">
@@ -29,8 +33,8 @@
                     <li><a href="index.html" class="nav-link">Accueil</a></li>
                     <li><a href="studios.html" class="nav-link">Studios</a></li>
                     <li><a href="favorites.html" class="nav-link">
-                        <i class="fas fa-heart"></i> Favoris
-                    </a></li>
+                            <i class="fas fa-heart"></i> Favoris
+                        </a></li>
                     <li class="nav-auth" id="navAuth">
                         <a href="login.html" class="btn btn-outline">Connexion</a>
                         <a href="register.html" class="btn btn-primary">Inscription</a>
@@ -43,8 +47,8 @@
                                 <i class="fas fa-chevron-down"></i>
                             </button>
                             <div class="dropdown-menu" id="profileDropdown">
+                                <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
                                 <a href="add-studio.html"><i class="fas fa-plus-circle"></i> Ajouter Studio</a>
-                                <a href="#"><i class="fas fa-user"></i> Mon Profil</a>
                                 <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
                             </div>
                         </div>
@@ -125,7 +129,7 @@
                                 </div>
                                 <div class="studio-location-large">
                                     <i class="fas fa-map-marker-alt"></i>
-                                    <span id="studioLocation">Paris, France</span>
+                                    <span id="studioLocation">Casablanca, Maroc</span>
                                 </div>
                             </div>
                         </div>
@@ -141,7 +145,7 @@
                             <span class="price-label">Tarif</span>
                             <div class="price-value">
                                 <span class="price-amount-large" id="studioPrice">80</span>
-                                <span class="price-currency">€</span>
+                                <span class="price-currency">DH</span>
                                 <span class="price-unit">/heure</span>
                             </div>
                         </div>
@@ -198,7 +202,10 @@
                             <i class="fas fa-info-circle"></i> Description
                         </h3>
                         <p class="studio-description" id="studioDescription">
-                            Notre studio professionnel de 120m² situé au cœur de Paris offre un espace lumineux et modulable pour tous vos projets photographiques. Équipé du matériel le plus récent et d'une équipe technique disponible sur demande, nous garantissons des conditions de travail optimales pour vos shootings de mariage, portrait ou commercial.
+                            Notre studio professionnel de 120m² situé au cœur de Casablanca offre un espace lumineux et
+                            modulable pour tous vos projets photographiques. Équipé du matériel le plus récent et d'une
+                            équipe technique disponible sur demande, nous garantissons des conditions de travail
+                            optimales pour vos shootings de mariage, portrait ou commercial au Maroc.
                         </p>
                     </div>
 
@@ -269,7 +276,8 @@
                         <span>PhotoStudio<span class="accent">Hub</span></span>
                     </div>
                     <p class="footer-description">
-                        La plateforme de référence pour trouver et réserver les meilleurs studios photo professionnels en France.
+                        La plateforme de référence pour trouver et réserver les meilleurs studios photo professionnels
+                        au Maroc.
                     </p>
                     <div class="social-links">
                         <a href="#" class="social-link" aria-label="Facebook">
@@ -337,4 +345,5 @@
     <script src="js/main.js"></script>
     <script src="js/studio-detail.js"></script>
 </body>
+
 </html>

@@ -93,6 +93,17 @@ app.get('/api/auth/me', authMiddleware, async (c) => {
     return c.json(user);
 });
 
+// Get My Studios (For Dashboard)
+app.get('/api/auth/my-items', authMiddleware, async (c) => {
+    const user = c.get('user');
+    try {
+        const { results } = await c.env.DB.prepare('SELECT * FROM studios WHERE created_by = ? ORDER BY created_at DESC').bind(user.id).all();
+        return c.json(results);
+    } catch (e) {
+        return c.json({ error: 'Failed to fetch your studios', details: e.message }, 500);
+    }
+});
+
 // Test DB connection
 app.get('/api/test-db', async (c) => {
     try {
