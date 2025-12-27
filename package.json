@@ -1,0 +1,17 @@
+{
+  "name": "photography-studio-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "hono": "^4.6.14",
+    "jsonwebtoken": "^9.0.3"
+  },
+  "devDependencies": {
+    "wrangler": "^3.99.0"
+  }
+}

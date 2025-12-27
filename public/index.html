@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Trouvez et réservez les meilleurs studios photo pour vos projets de mariage, portrait et commercial">
+    <title>PhotoStudio Hub - Plateforme de Gestion de Studios Photo</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-camera">
+                <i class="fas fa-camera"></i>
+            </div>
+            <div class="loading-text">PhotoStudio Hub</div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <!-- Logo -->
+                <a href="index.html" class="logo">
+                    <i class="fas fa-camera-retro"></i>
+                    <span>PhotoStudio<span class="accent">Hub</span></span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="index.html" class="nav-link active">Accueil</a></li>
+                    <li><a href="studios.html" class="nav-link">Studios</a></li>
+                    <li><a href="favorites.html" class="nav-link">
+                        <i class="fas fa-heart"></i> Favoris
+                    </a></li>
+                    <li class="nav-auth" id="navAuth">
+                        <a href="login.html" class="btn btn-outline">Connexion</a>
+                        <a href="register.html" class="btn btn-primary">Inscription</a>
+                    </li>
+                    <li class="nav-profile" id="navProfile" style="display: none;">
+                        <div class="profile-dropdown">
+                            <button class="profile-btn" id="profileBtn">
+                                <i class="fas fa-user-circle"></i>
+                                <span id="usernameDisplay">Utilisateur</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-menu" id="profileDropdown">
+                                <a href="add-studio.html"><i class="fas fa-plus-circle"></i> Ajouter Studio</a>
+                                <a href="#"><i class="fas fa-user"></i> Mon Profil</a>
+                                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-toggle" id="mobileToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-background">
+            <div class="hero-overlay"></div>
+            <div class="hero-shapes">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+            </div>
+        </div>
+        
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text" data-aos="fade-up">
+                    <h1 class="hero-title">
+                        Trouvez le Studio Photo
+                        <span class="gradient-text">Parfait</span>
+                        pour Votre Projet
+                    </h1>
+                    <p class="hero-description">
+                        Découvrez une sélection de studios professionnels équipés pour tous vos besoins : 
+                        mariages, portraits, shootings commerciaux et bien plus encore.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="studios.html" class="btn btn-primary btn-large">
+                            <i class="fas fa-search"></i>
+                            Explorer les Studios
+                        </a>
+                        <a href="#features" class="btn btn-outline btn-large">
+                            <i class="fas fa-play-circle"></i>
+                            En Savoir Plus
+                        </a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
+                            <div class="stat-number">150+</div>
+                            <div class="stat-label">Studios</div>
+                        </div>
+                        <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
+                            <div class="stat-number">50+</div>
+                            <div class="stat-label">Villes</div>
+                        </div>
+                        <div class="stat-item" data-aos="fade-up" data-aos-delay="300">
+                            <div class="stat-number">2500+</div>
+                            <div class="stat-label">Réservations</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hero-image" data-aos="fade-left" data-aos-delay="200">
+                    <div class="floating-card card-1">
+                        <i class="fas fa-camera"></i>
+                        <span>Portrait</span>
+                    </div>
+                    <div class="floating-card card-2">
+                        <i class="fas fa-ring"></i>
+                        <span>Mariage</span>
+                    </div>
+                    <div class="floating-card card-3">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Commercial</span>
+                    </div>
+                    <div class="hero-main-card">
+                        <div class="card-image-placeholder">
+                            <i class="fas fa-camera-retro"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scroll-indicator">
+            <div class="mouse">
+                <div class="wheel"></div>
+            </div>
+            <div class="arrow">
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Studios Section -->
+    <section class="featured-studios" id="featured">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-badge">Sélection Premium</span>
+                <h2 class="section-title">Studios en Vedette</h2>
+                <p class="section-description">
+                    Découvrez nos studios les plus populaires et les mieux équipés
+                </p>
+            </div>
+
+            <div class="studios-grid" id="featuredStudiosGrid">
+                <!-- Studios will be dynamically loaded here -->
+                <div class="studio-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="studio-card-image">
+                        <div class="studio-badge available">Disponible</div>
+                        <button class="favorite-btn" data-studio-id="1">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                        </div>
+                    </div>
+                    <div class="studio-card-content">
+                        <div class="studio-header">
+                            <h3 class="studio-name">Studio Lumière Pro</h3>
+                            <div class="studio-rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.8</span>
+                            </div>
+                        </div>
+                        <div class="studio-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Paris, France</span>
+                        </div>
+                        <div class="studio-services">
+                            <span class="service-tag"><i class="fas fa-ring"></i> Mariage</span>
+                            <span class="service-tag"><i class="fas fa-user"></i> Portrait</span>
+                        </div>
+                        <div class="studio-equipment">
+                            <span class="equipment-item" title="Éclairage Professionnel">
+                                <i class="fas fa-lightbulb"></i>
+                            </span>
+                            <span class="equipment-item" title="Fond Vert/Blanc">
+                                <i class="fas fa-palette"></i>
+                            </span>
+                            <span class="equipment-item" title="Vestiaire">
+                                <i class="fas fa-door-open"></i>
+                            </span>
+                        </div>
+                        <div class="studio-footer">
+                            <div class="studio-price">
+                                <span class="price-amount">80€</span>
+                                <span class="price-unit">/heure</span>
+                            </div>
+                            <a href="studio-detail.html?id=1" class="btn btn-primary btn-sm">
+                                Voir Détails
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="studio-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="studio-card-image">
+                        <div class="studio-badge reserved">Réservé</div>
+                        <button class="favorite-btn" data-studio-id="2">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                        </div>
+                    </div>
+                    <div class="studio-card-content">
+                        <div class="studio-header">
+                            <h3 class="studio-name">Atelier Créatif 360</h3>
+                            <div class="studio-rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.9</span>
+                            </div>
+                        </div>
+                        <div class="studio-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Lyon, France</span>
+                        </div>
+                        <div class="studio-services">
+                            <span class="service-tag"><i class="fas fa-briefcase"></i> Commercial</span>
+                            <span class="service-tag"><i class="fas fa-user"></i> Portrait</span>
+                        </div>
+                        <div class="studio-equipment">
+                            <span class="equipment-item" title="Éclairage Professionnel">
+                                <i class="fas fa-lightbulb"></i>
+                            </span>
+                            <span class="equipment-item" title="Fond Vert/Blanc">
+                                <i class="fas fa-palette"></i>
+                            </span>
+                            <span class="equipment-item" title="Cyclorama">
+                                <i class="fas fa-circle"></i>
+                            </span>
+                        </div>
+                        <div class="studio-footer">
+                            <div class="studio-price">
+                                <span class="price-amount">120€</span>
+                                <span class="price-unit">/heure</span>
+                            </div>
+                            <a href="studio-detail.html?id=2" class="btn btn-primary btn-sm">
+                                Voir Détails
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="studio-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="studio-card-image">
+                        <div class="studio-badge available">Disponible</div>
+                        <button class="favorite-btn" data-studio-id="3">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <div class="image-placeholder">
+                            <i class="fas fa-image"></i>
+                        </div>
+                    </div>
+                    <div class="studio-card-content">
+                        <div class="studio-header">
+                            <h3 class="studio-name">Studio Élégance</h3>
+                            <div class="studio-rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.7</span>
+                            </div>
+                        </div>
+                        <div class="studio-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Marseille, France</span>
+                        </div>
+                        <div class="studio-services">
+                            <span class="service-tag"><i class="fas fa-ring"></i> Mariage</span>
+                            <span class="service-tag"><i class="fas fa-briefcase"></i> Commercial</span>
+                        </div>
+                        <div class="studio-equipment">
+                            <span class="equipment-item" title="Éclairage Professionnel">
+                                <i class="fas fa-lightbulb"></i>
+                            </span>
+                            <span class="equipment-item" title="Maquillage">
+                                <i class="fas fa-magic"></i>
+                            </span>
+                        </div>
+                        <div class="studio-footer">
+                            <div class="studio-price">
+                                <span class="price-amount">95€</span>
+                                <span class="price-unit">/heure</span>
+                            </div>
+                            <a href="studio-detail.html?id=3" class="btn btn-primary btn-sm">
+                                Voir Détails
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-cta" data-aos="fade-up">
+                <a href="studios.html" class="btn btn-outline btn-large">
+                    Voir Tous les Studios
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-badge">Pourquoi Nous Choisir</span>
+                <h2 class="section-title">Une Plateforme Complète</h2>
+                <p class="section-description">
+                    Tous les outils dont vous avez besoin pour trouver et réserver votre studio idéal
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 class="feature-title">Recherche Avancée</h3>
+                    <p class="feature-description">
+                        Filtrez par ville, services, tarifs et équipements pour trouver exactement ce dont vous avez besoin.
+                    </p>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Vérification Qualité</h3>
+                    <p class="feature-description">
+                        Tous nos studios sont vérifiés et notés par notre communauté de photographes professionnels.
+                    </p>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3 class="feature-title">Réservation Instantanée</h3>
+                    <p class="feature-description">
+                        Vérifiez la disponibilité en temps réel et réservez votre créneau en quelques clics seulement.
+                    </p>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3 class="feature-title">Favoris & Comparaison</h3>
+                    <p class="feature-description">
+                        Sauvegardez vos studios préférés et comparez leurs caractéristiques facilement.
+                    </p>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="feature-icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h3 class="feature-title">Tarifs Transparents</h3>
+                    <p class="feature-description">
+                        Prix affichés clairement sans frais cachés. Comparez et choisissez selon votre budget.
+                    </p>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="600">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3 class="feature-title">Support 24/7</h3>
+                    <p class="feature-description">
+                        Notre équipe est disponible pour vous accompagner à chaque étape de votre réservation.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-background">
+            <div class="cta-overlay"></div>
+        </div>
+        <div class="container">
+            <div class="cta-content" data-aos="zoom-in">
+                <h2 class="cta-title">Prêt à Commencer Votre Projet ?</h2>
+                <p class="cta-description">
+                    Rejoignez des milliers de photographes qui font confiance à PhotoStudio Hub
+                </p>
+                <div class="cta-buttons">
+                    <a href="register.html" class="btn btn-primary btn-large">
+                        <i class="fas fa-user-plus"></i>
+                        Créer un Compte
+                    </a>
+                    <a href="studios.html" class="btn btn-outline btn-large btn-white">
+                        <i class="fas fa-compass"></i>
+                        Explorer Maintenant
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-camera-retro"></i>
+                        <span>PhotoStudio<span class="accent">Hub</span></span>
+                    </div>
+                    <p class="footer-description">
+                        La plateforme de référence pour trouver et réserver les meilleurs studios photo professionnels en France.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Navigation</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="studios.html">Studios</a></li>
+                        <li><a href="favorites.html">Favoris</a></li>
+                        <li><a href="add-studio.html">Ajouter un Studio</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Services</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Studios Mariage</a></li>
+                        <li><a href="#">Studios Portrait</a></li>
+                        <li><a href="#">Studios Commercial</a></li>
+                        <li><a href="#">Équipements Premium</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Centre d'Aide</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Conditions d'Utilisation</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 PhotoStudio Hub. Tous droits réservés.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Politique de Confidentialité</a>
+                    <a href="#">Mentions Légales</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTop" aria-label="Retour en haut">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Custom JavaScript -->
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Parcourez notre sélection complète de studios photo professionnels">
+    <title>Studios Photo - PhotoStudio Hub</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-camera-retro"></i>
+                    <span>PhotoStudio<span class="accent">Hub</span></span>
+                </a>
+
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="index.html" class="nav-link">Accueil</a></li>
+                    <li><a href="studios.html" class="nav-link active">Studios</a></li>
+                    <li><a href="favorites.html" class="nav-link">
+                        <i class="fas fa-heart"></i> Favoris
+                    </a></li>
+                    <li class="nav-auth" id="navAuth">
+                        <a href="login.html" class="btn btn-outline">Connexion</a>
+                        <a href="register.html" class="btn btn-primary">Inscription</a>
+                    </li>
+                    <li class="nav-profile" id="navProfile" style="display: none;">
+                        <div class="profile-dropdown">
+                            <button class="profile-btn" id="profileBtn">
+                                <i class="fas fa-user-circle"></i>
+                                <span id="usernameDisplay">Utilisateur</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-menu" id="profileDropdown">
+                                <a href="add-studio.html"><i class="fas fa-plus-circle"></i> Ajouter Studio</a>
+                                <a href="#"><i class="fas fa-user"></i> Mon Profil</a>
+                                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <button class="mobile-toggle" id="mobileToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="page-header-background"></div>
+        <div class="container">
+            <div class="page-header-content">
+                <h1 class="page-title">Nos Studios Photo</h1>
+                <p class="page-description">Découvrez notre collection de studios professionnels</p>
+                <div class="breadcrumb">
+                    <a href="index.html">Accueil</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <span>Studios</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Studios Listing Section -->
+    <section class="studios-listing">
+        <div class="container">
+            <div class="studios-listing-wrapper">
+                <!-- Sidebar Filters -->
+                <aside class="filters-sidebar" id="filtersSidebar">
+                    <div class="filters-header">
+                        <h3><i class="fas fa-filter"></i> Filtres</h3>
+                        <button class="close-filters" id="closeFilters">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <div class="filter-section">
+                        <div class="filter-header">
+                            <h4>Recherche</h4>
+                        </div>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="Nom du studio...">
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <div class="filter-header">
+                            <h4>Services</h4>
+                        </div>
+                        <div class="filter-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="service" value="mariage">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-text">
+                                    <i class="fas fa-ring"></i> Mariage
+                                </span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="service" value="portrait">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-text">
+                                    <i class="fas fa-user"></i> Portrait
+                                </span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="service" value="commercial">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-text">
+                                    <i class="fas fa-briefcase"></i> Commercial
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <div class="filter-header">
+                            <h4>Statut</h4>
+                        </div>
+                        <div class="filter-options">
+                            <label class="radio-label">
+                                <input type="radio" name="status" value="all" checked>
+                                <span class="radio-custom"></span>
+                                <span class="radio-text">Tous</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="status" value="available">
+                                <span class="radio-custom"></span>
+                                <span class="radio-text">Disponible</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="status" value="reserved">
+                                <span class="radio-custom"></span>
+                                <span class="radio-text">Réservé</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <div class="filter-header">
+                            <h4>Prix par Heure</h4>
+                        </div>
+                        <div class="range-slider">
+                            <div class="range-values">
+                                <span id="minPrice">0€</span>
+                                <span id="maxPrice">300€</span>
+                            </div>
+                            <input type="range" id="priceRange" min="0" max="300" value="300" step="10">
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <div class="filter-header">
+                            <h4>Ville</h4>
+                        </div>
+                        <div class="select-wrapper">
+                            <select id="cityFilter">
+                                <option value="">Toutes les villes</option>
+                                <option value="paris">Paris</option>
+                                <option value="lyon">Lyon</option>
+                                <option value="marseille">Marseille</option>
+                                <option value="toulouse">Toulouse</option>
+                                <option value="nice">Nice</option>
+                                <option value="nantes">Nantes</option>
+                                <option value="bordeaux">Bordeaux</option>
+                            </select>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <div class="filter-header">
+                            <h4>Équipements</h4>
+                        </div>
+                        <div class="filter-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipment" value="lighting">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-text">
+                                    <i class="fas fa-lightbulb"></i> Éclairage Pro
+                                </span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipment" value="backdrop">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-text">
+                                    <i class="fas fa-palette"></i> Fonds
+                                </span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipment" value="cyclorama">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-text">
+                                    <i class="fas fa-circle"></i> Cyclorama
+                                </span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="equipment" value="makeup">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-text">
+                                    <i class="fas fa-magic"></i> Maquillage
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button class="btn btn-outline btn-block" id="resetFilters">
+                            <i class="fas fa-redo"></i> Réinitialiser
+                        </button>
+                        <button class="btn btn-primary btn-block" id="applyFilters">
+                            <i class="fas fa-check"></i> Appliquer
+                        </button>
+                    </div>
+                </aside>
+
+                <!-- Main Content -->
+                <main class="studios-main">
+                    <!-- Toolbar -->
+                    <div class="studios-toolbar">
+                        <div class="toolbar-left">
+                            <button class="btn btn-outline mobile-filter-toggle" id="mobileFilterToggle">
+                                <i class="fas fa-filter"></i>
+                                Filtres
+                            </button>
+                            <div class="results-count">
+                                <strong id="resultsCount">12</strong> studios trouvés
+                            </div>
+                        </div>
+                        <div class="toolbar-right">
+                            <div class="sort-dropdown">
+                                <label for="sortBy">Trier par:</label>
+                                <select id="sortBy">
+                                    <option value="newest">Plus récents</option>
+                                    <option value="price-asc">Prix croissant</option>
+                                    <option value="price-desc">Prix décroissant</option>
+                                    <option value="rating">Meilleure note</option>
+                                    <option value="name">Nom (A-Z)</option>
+                                </select>
+                            </div>
+                            <div class="view-toggle">
+                                <button class="view-btn active" data-view="grid" title="Grille">
+                                    <i class="fas fa-th-large"></i>
+                                </button>
+                                <button class="view-btn" data-view="list" title="Liste">
+                                    <i class="fas fa-list"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Studios Grid -->
+                    <div class="studios-grid" id="studiosGrid">
+                        <!-- Loading skeleton -->
+                        <div class="skeleton-card">
+                            <div class="skeleton-image"></div>
+                            <div class="skeleton-content">
+                                <div class="skeleton-line"></div>
+                                <div class="skeleton-line short"></div>
+                                <div class="skeleton-line"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton-card">
+                            <div class="skeleton-image"></div>
+                            <div class="skeleton-content">
+                                <div class="skeleton-line"></div>
+                                <div class="skeleton-line short"></div>
+                                <div class="skeleton-line"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton-card">
+                            <div class="skeleton-image"></div>
+                            <div class="skeleton-content">
+                                <div class="skeleton-line"></div>
+                                <div class="skeleton-line short"></div>
+                                <div class="skeleton-line"></div>
+                            </div>
+                        </div>
+                        <!-- Studios will be dynamically loaded here -->
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination" id="pagination">
+                        <button class="pagination-btn prev" id="prevPage" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                            Précédent
+                        </button>
+                        <div class="pagination-numbers" id="paginationNumbers">
+                            <button class="pagination-number active">1</button>
+                            <button class="pagination-number">2</button>
+                            <button class="pagination-number">3</button>
+                            <span class="pagination-dots">...</span>
+                            <button class="pagination-number">8</button>
+                        </div>
+                        <button class="pagination-btn next" id="nextPage">
+                            Suivant
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-camera-retro"></i>
+                        <span>PhotoStudio<span class="accent">Hub</span></span>
+                    </div>
+                    <p class="footer-description">
+                        La plateforme de référence pour trouver et réserver les meilleurs studios photo professionnels en France.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Navigation</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="studios.html">Studios</a></li>
+                        <li><a href="favorites.html">Favoris</a></li>
+                        <li><a href="add-studio.html">Ajouter un Studio</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Services</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Studios Mariage</a></li>
+                        <li><a href="#">Studios Portrait</a></li>
+                        <li><a href="#">Studios Commercial</a></li>
+                        <li><a href="#">Équipements Premium</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Centre d'Aide</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Conditions d'Utilisation</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 PhotoStudio Hub. Tous droits réservés.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Politique de Confidentialité</a>
+                    <a href="#">Mentions Légales</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTop" aria-label="Retour en haut">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Custom JavaScript -->
+    <script src="js/main.js"></script>
+    <script src="js/studios.js"></script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vos studios photo favoris">
+    <title>Mes Favoris - PhotoStudio Hub</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-camera-retro"></i>
+                    <span>PhotoStudio<span class="accent">Hub</span></span>
+                </a>
+
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="index.html" class="nav-link">Accueil</a></li>
+                    <li><a href="studios.html" class="nav-link">Studios</a></li>
+                    <li><a href="favorites.html" class="nav-link active">
+                        <i class="fas fa-heart"></i> Favoris
+                    </a></li>
+                    <li class="nav-auth" id="navAuth">
+                        <a href="login.html" class="btn btn-outline">Connexion</a>
+                        <a href="register.html" class="btn btn-primary">Inscription</a>
+                    </li>
+                    <li class="nav-profile" id="navProfile" style="display: none;">
+                        <div class="profile-dropdown">
+                            <button class="profile-btn" id="profileBtn">
+                                <i class="fas fa-user-circle"></i>
+                                <span id="usernameDisplay">Utilisateur</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-menu" id="profileDropdown">
+                                <a href="add-studio.html"><i class="fas fa-plus-circle"></i> Ajouter Studio</a>
+                                <a href="#"><i class="fas fa-user"></i> Mon Profil</a>
+                                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <button class="mobile-toggle" id="mobileToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="page-header-background"></div>
+        <div class="container">
+            <div class="page-header-content">
+                <h1 class="page-title">
+                    <i class="fas fa-heart"></i>
+                    Mes Studios Favoris
+                </h1>
+                <p class="page-description">Retrouvez tous les studios que vous avez sauvegardés</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Favorites Section -->
+    <section class="favorites-section">
+        <div class="container">
+            <!-- Auth Required Message -->
+            <div class="auth-required" id="authRequired">
+                <div class="auth-required-content">
+                    <div class="auth-required-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h2>Connexion Requise</h2>
+                    <p>Veuillez vous connecter pour accéder à vos favoris</p>
+                    <div class="auth-required-actions">
+                        <a href="login.html" class="btn btn-primary btn-large">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Se Connecter
+                        </a>
+                        <a href="register.html" class="btn btn-outline btn-large">
+                            <i class="fas fa-user-plus"></i>
+                            Créer un Compte
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Favorites Content -->
+            <div class="favorites-content" id="favoritesContent" style="display: none;">
+                <div class="favorites-toolbar">
+                    <div class="favorites-count">
+                        <i class="fas fa-heart"></i>
+                        <span id="favoritesCount">0</span> studio(s) favori(s)
+                    </div>
+                    <div class="favorites-actions">
+                        <button class="btn btn-outline" id="clearAllFavorites">
+                            <i class="fas fa-trash"></i>
+                            Tout Supprimer
+                        </button>
+                        <a href="studios.html" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Ajouter des Studios
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-heart-broken"></i>
+                    </div>
+                    <h3>Aucun Favori</h3>
+                    <p>Vous n'avez pas encore ajouté de studios à vos favoris</p>
+                    <a href="studios.html" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                        Explorer les Studios
+                    </a>
+                </div>
+
+                <!-- Favorites Grid -->
+                <div class="studios-grid" id="favoritesGrid">
+                    <!-- Favorite studios will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-camera-retro"></i>
+                        <span>PhotoStudio<span class="accent">Hub</span></span>
+                    </div>
+                    <p class="footer-description">
+                        La plateforme de référence pour trouver et réserver les meilleurs studios photo professionnels en France.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Navigation</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="studios.html">Studios</a></li>
+                        <li><a href="favorites.html">Favoris</a></li>
+                        <li><a href="add-studio.html">Ajouter un Studio</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Services</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Studios Mariage</a></li>
+                        <li><a href="#">Studios Portrait</a></li>
+                        <li><a href="#">Studios Commercial</a></li>
+                        <li><a href="#">Équipements Premium</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Centre d'Aide</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Conditions d'Utilisation</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 PhotoStudio Hub. Tous droits réservés.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Politique de Confidentialité</a>
+                    <a href="#">Mentions Légales</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTop" aria-label="Retour en haut">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Custom JavaScript -->
+    <script src="js/main.js"></script>
+    <script src="js/favorites.js"></script>
+</body>
+</html>

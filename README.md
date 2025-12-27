@@ -4,7 +4,7 @@
 
 **PhotoStudio Hub** is a professional, modern, and fully responsive web platform for managing and discovering photography studios. Built with a mobile-first approach, it features smooth 3D effects, animated transitions, and interactive elements for a dynamic user experience.
 
-This is a **frontend-only demonstration** of the platform's user interface and user experience. All data is stored locally using localStorage, and API calls are simulated for demonstration purposes.
+This project is a **Full-Stack Application** utilizing **Cloudflare Workers** (Hono framework) for the backend and **Cloudflare D1** (SQLite) for the database. The frontend interacts with this backend via a centralized API helper.
 
 ---
 
@@ -411,4 +411,3 @@ For questions or issues with this frontend demo, please refer to the code commen
 ---
 
 **Enjoy exploring PhotoStudio Hub! 📸✨**
-"# photography_studio" 

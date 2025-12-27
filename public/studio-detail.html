@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Détails du studio photo">
+    <title>Détails Studio - PhotoStudio Hub</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-camera-retro"></i>
+                    <span>PhotoStudio<span class="accent">Hub</span></span>
+                </a>
+
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="index.html" class="nav-link">Accueil</a></li>
+                    <li><a href="studios.html" class="nav-link">Studios</a></li>
+                    <li><a href="favorites.html" class="nav-link">
+                        <i class="fas fa-heart"></i> Favoris
+                    </a></li>
+                    <li class="nav-auth" id="navAuth">
+                        <a href="login.html" class="btn btn-outline">Connexion</a>
+                        <a href="register.html" class="btn btn-primary">Inscription</a>
+                    </li>
+                    <li class="nav-profile" id="navProfile" style="display: none;">
+                        <div class="profile-dropdown">
+                            <button class="profile-btn" id="profileBtn">
+                                <i class="fas fa-user-circle"></i>
+                                <span id="usernameDisplay">Utilisateur</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-menu" id="profileDropdown">
+                                <a href="add-studio.html"><i class="fas fa-plus-circle"></i> Ajouter Studio</a>
+                                <a href="#"><i class="fas fa-user"></i> Mon Profil</a>
+                                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <button class="mobile-toggle" id="mobileToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Studio Detail Section -->
+    <section class="studio-detail">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html">Accueil</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="studios.html">Studios</a>
+                <i class="fas fa-chevron-right"></i>
+                <span id="studioName">Studio</span>
+            </div>
+
+            <div class="studio-detail-wrapper">
+                <!-- Gallery Section -->
+                <div class="studio-gallery">
+                    <div class="main-image">
+                        <div class="image-placeholder large">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <div class="gallery-overlay">
+                            <button class="favorite-btn-large" id="favoriteBtnDetail">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="thumbnail-grid">
+                        <div class="thumbnail active">
+                            <div class="image-placeholder">
+                                <i class="fas fa-image"></i>
+                            </div>
+                        </div>
+                        <div class="thumbnail">
+                            <div class="image-placeholder">
+                                <i class="fas fa-image"></i>
+                            </div>
+                        </div>
+                        <div class="thumbnail">
+                            <div class="image-placeholder">
+                                <i class="fas fa-image"></i>
+                            </div>
+                        </div>
+                        <div class="thumbnail">
+                            <div class="image-placeholder">
+                                <i class="fas fa-image"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Section -->
+                <div class="studio-info">
+                    <div class="studio-header-detail">
+                        <div class="studio-title-section">
+                            <h1 class="studio-name-large" id="studioNameLarge">Studio Lumière Pro</h1>
+                            <div class="studio-meta">
+                                <div class="studio-rating-large">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                    <span class="rating-value">4.8</span>
+                                    <span class="rating-count">(124 avis)</span>
+                                </div>
+                                <div class="studio-location-large">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span id="studioLocation">Paris, France</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="studio-status-large" id="studioStatus">
+                            <span class="badge-large available">
+                                <i class="fas fa-check-circle"></i> Disponible
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="studio-price-section">
+                        <div class="price-display">
+                            <span class="price-label">Tarif</span>
+                            <div class="price-value">
+                                <span class="price-amount-large" id="studioPrice">80</span>
+                                <span class="price-currency">€</span>
+                                <span class="price-unit">/heure</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-large btn-block">
+                            <i class="fas fa-calendar-check"></i>
+                            Réserver Maintenant
+                        </button>
+                    </div>
+
+                    <div class="studio-services-section">
+                        <h3 class="section-title-small">
+                            <i class="fas fa-briefcase"></i> Services Proposés
+                        </h3>
+                        <div class="services-tags" id="studioServices">
+                            <span class="service-tag-large">
+                                <i class="fas fa-ring"></i> Mariage
+                            </span>
+                            <span class="service-tag-large">
+                                <i class="fas fa-user"></i> Portrait
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="studio-equipment-section">
+                        <h3 class="section-title-small">
+                            <i class="fas fa-tools"></i> Équipements Disponibles
+                        </h3>
+                        <ul class="equipment-list" id="studioEquipment">
+                            <li class="equipment-item-large">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Éclairage professionnel (Softbox, Parapluie, LED)</span>
+                            </li>
+                            <li class="equipment-item-large">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Fonds Blanc, Noir et Vert</span>
+                            </li>
+                            <li class="equipment-item-large">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Vestiaire et espace maquillage</span>
+                            </li>
+                            <li class="equipment-item-large">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Système audio Bluetooth</span>
+                            </li>
+                            <li class="equipment-item-large">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Wifi Haut Débit</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="studio-description-section">
+                        <h3 class="section-title-small">
+                            <i class="fas fa-info-circle"></i> Description
+                        </h3>
+                        <p class="studio-description" id="studioDescription">
+                            Notre studio professionnel de 120m² situé au cœur de Paris offre un espace lumineux et modulable pour tous vos projets photographiques. Équipé du matériel le plus récent et d'une équipe technique disponible sur demande, nous garantissons des conditions de travail optimales pour vos shootings de mariage, portrait ou commercial.
+                        </p>
+                    </div>
+
+                    <div class="studio-features-section">
+                        <h3 class="section-title-small">
+                            <i class="fas fa-star"></i> Caractéristiques
+                        </h3>
+                        <div class="features-grid-detail">
+                            <div class="feature-item-detail">
+                                <i class="fas fa-ruler-combined"></i>
+                                <div class="feature-info">
+                                    <span class="feature-label">Surface</span>
+                                    <span class="feature-value">120 m²</span>
+                                </div>
+                            </div>
+                            <div class="feature-item-detail">
+                                <i class="fas fa-arrows-alt-v"></i>
+                                <div class="feature-info">
+                                    <span class="feature-label">Hauteur sous plafond</span>
+                                    <span class="feature-value">4.5 m</span>
+                                </div>
+                            </div>
+                            <div class="feature-item-detail">
+                                <i class="fas fa-users"></i>
+                                <div class="feature-info">
+                                    <span class="feature-label">Capacité</span>
+                                    <span class="feature-value">15 personnes</span>
+                                </div>
+                            </div>
+                            <div class="feature-item-detail">
+                                <i class="fas fa-parking"></i>
+                                <div class="feature-info">
+                                    <span class="feature-label">Parking</span>
+                                    <span class="feature-value">Disponible</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="studio-actions" id="studioActions" style="display: none;">
+                        <button class="btn btn-outline" id="editStudioBtn">
+                            <i class="fas fa-edit"></i> Modifier
+                        </button>
+                        <button class="btn btn-danger" id="deleteStudioBtn">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Similar Studios -->
+            <div class="similar-studios">
+                <h2 class="section-title-main">Studios Similaires</h2>
+                <div class="studios-grid">
+                    <!-- Similar studios will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-camera-retro"></i>
+                        <span>PhotoStudio<span class="accent">Hub</span></span>
+                    </div>
+                    <p class="footer-description">
+                        La plateforme de référence pour trouver et réserver les meilleurs studios photo professionnels en France.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Navigation</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="studios.html">Studios</a></li>
+                        <li><a href="favorites.html">Favoris</a></li>
+                        <li><a href="add-studio.html">Ajouter un Studio</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Services</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Studios Mariage</a></li>
+                        <li><a href="#">Studios Portrait</a></li>
+                        <li><a href="#">Studios Commercial</a></li>
+                        <li><a href="#">Équipements Premium</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Centre d'Aide</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Conditions d'Utilisation</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 PhotoStudio Hub. Tous droits réservés.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Politique de Confidentialité</a>
+                    <a href="#">Mentions Légales</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTop" aria-label="Retour en haut">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Custom JavaScript -->
+    <script src="js/main.js"></script>
+    <script src="js/studio-detail.js"></script>
+</body>
+</html>
