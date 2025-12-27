@@ -1,6 +1,8 @@
 -- Cloudflare D1 (SQLite) Schema
 
 DROP TABLE IF EXISTS favorites;
+DROP TABLE IF EXISTS bookings;
+DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS studios;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS scraped_studios;
