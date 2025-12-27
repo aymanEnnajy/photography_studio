@@ -5,14 +5,15 @@ import { hash, compare } from 'bcryptjs'
 import { authMiddleware } from './middleware/auth'
 
 import { serveStatic } from 'hono/cloudflare-workers'
+import manifest from '__STATIC_CONTENT_MANIFEST'
 
 const app = new Hono()
 
 app.use('/*', cors())
 
 // Serve static files
-app.get('/*', serveStatic({ root: './' }))
-app.get('/', serveStatic({ path: './index.html' }))
+app.get('/*', serveStatic({ root: './', manifest }))
+app.get('/', serveStatic({ path: './index.html', manifest }))
 
 // Auth key for JWT
 const getJwtSecret = (c) => c.env.JWT_SECRET
