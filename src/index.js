@@ -410,8 +410,21 @@ app.get('/api/items/:id/reviews', async (c) => {
     }
 });
 
-// Serve static files (Fallback)
-app.get('/*', serveStatic({ root: '', manifest }))
+// Serve static files
+app.get('/css/*', serveStatic({ manifest }))
+app.get('/js/*', serveStatic({ manifest }))
+app.get('/assets/*', serveStatic({ manifest }))
+app.get('/favicon.ico', serveStatic({ manifest }))
+
+// Serve HTML files
 app.get('/', serveStatic({ path: 'index.html', manifest }))
+app.get('/index.html', serveStatic({ path: 'index.html', manifest }))
+app.get('/studios.html', serveStatic({ path: 'studios.html', manifest }))
+app.get('/studio-detail.html', serveStatic({ path: 'studio-detail.html', manifest }))
+app.get('/login.html', serveStatic({ path: 'login.html', manifest }))
+app.get('/register.html', serveStatic({ path: 'register.html', manifest }))
+app.get('/favorites.html', serveStatic({ path: 'favorites.html', manifest }))
+app.get('/add-studio.html', serveStatic({ path: 'add-studio.html', manifest }))
+app.get('/my-bookings.html', serveStatic({ path: 'my-bookings.html', manifest }))
 
 export default app
