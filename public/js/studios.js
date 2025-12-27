@@ -8,13 +8,42 @@ let allStudios = [];
 let currentPage = 1;
 const itemsPerPage = 6;
 let filteredStudios = [];
+let currentView = localStorage.getItem('studioView') || 'grid';
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', () => {
     initFilters();
     initPagination();
+    initViewToggle();
     loadStudios();
 });
+
+function initViewToggle() {
+    const viewBtns = document.querySelectorAll('.view-btn');
+    const studiosGrid = document.getElementById('studiosGrid');
+
+    // Set initial view
+    if (studiosGrid) {
+        studiosGrid.className = `studios-${currentView}`;
+        document.querySelector(`.view-btn[data-view="${currentView}"]`)?.classList.add('active');
+    }
+
+    viewBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const view = btn.dataset.view;
+            currentView = view;
+            localStorage.setItem('studioView', view);
+
+            // Update UI
+            viewBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            if (studiosGrid) {
+                studiosGrid.className = `studios-${view}`;
+            }
+        });
+    });
+}
 
 async function loadStudios() {
     try {
@@ -315,9 +344,10 @@ function createStudioCard(studio, index) {
             <button class="favorite-btn" data-studio-id="${studio.id}">
                 <i class="far fa-heart"></i>
             </button>
+            ${studio.image ? `<img src="${studio.image}" alt="${studio.name}" style="width: 100%; height: 100%; object-fit: cover;">` : `
             <div class="image-placeholder">
                 <i class="fas fa-image"></i>
-            </div>
+            </div>`}
         </div>
         <div class="studio-card-content">
             <div class="studio-header">
@@ -329,7 +359,7 @@ function createStudioCard(studio, index) {
             </div>
             <div class="studio-location">
                 <i class="fas fa-map-marker-alt"></i>
-                <span>${studio.city}, France</span>
+                <span>${studio.city}, Maroc</span>
             </div>
             <div class="studio-services">
                 ${servicesHTML}

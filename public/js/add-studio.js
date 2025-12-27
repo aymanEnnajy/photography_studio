@@ -220,20 +220,46 @@ function updatePreview() {
 
     const studioLocation = previewCard.querySelector('.studio-location span');
     const cityNames = {
-        'paris': 'Paris',
-        'lyon': 'Lyon',
-        'marseille': 'Marseille',
-        'toulouse': 'Toulouse',
-        'nice': 'Nice',
-        'nantes': 'Nantes',
-        'bordeaux': 'Bordeaux',
-        'lille': 'Lille',
-        'strasbourg': 'Strasbourg'
+        'casablanca': 'Casablanca',
+        'rabat': 'Rabat',
+        'marrakech': 'Marrakech',
+        'tanger': 'Tanger',
+        'agadir': 'Agadir',
+        'fès': 'Fès',
+        'fes': 'Fès',
+        'meknès': 'Meknès',
+        'meknes': 'Meknès',
+        'oujda': 'Oujda',
+        'kénitra': 'Kénitra',
+        'kenitra': 'Kénitra'
     };
     studioLocation.textContent = cityNames[city] || city;
 
     const priceAmount = previewCard.querySelector('.price-amount');
-    priceAmount.textContent = `${price}€`;
+    priceAmount.textContent = `${price} DH`;
+
+    // Update Image Preview
+    const imageUrl = document.getElementById('imageUrl').value;
+    const imagePreviewContainer = previewCard.querySelector('.studio-card-image');
+    if (imageUrl && imageUrl.startsWith('http')) {
+        imagePreviewContainer.innerHTML = `
+            <div class="studio-badge ${status}">${status === 'available' ? 'Disponible' : 'Réservé'}</div>
+            <button class="favorite-btn">
+                <i class="far fa-heart"></i>
+            </button>
+            <img src="${imageUrl}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
+        `;
+    } else {
+        imagePreviewContainer.innerHTML = `
+            <div class="studio-badge ${status}">${status === 'available' ? 'Disponible' : 'Réservé'}</div>
+            <button class="favorite-btn">
+                <i class="far fa-heart"></i>
+            </button>
+            <div class="image-placeholder">
+                <i class="fas fa-image"></i>
+            </div>
+        `;
+    }
 
     // Update services
     const servicesContainer = previewCard.querySelector('.studio-services');
