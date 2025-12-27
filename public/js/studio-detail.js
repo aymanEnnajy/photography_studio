@@ -33,10 +33,14 @@ async function loadStudioDetails() {
         };
 
         // Update page content
-        updateStudioDetails(studio);
-
-        // Check if user owns this studio
-        checkStudioOwnership(studio);
+        try {
+            updateStudioDetails(studio);
+            // Check if user owns this studio
+            checkStudioOwnership(studio);
+        } catch (renderError) {
+            console.error('Error rendering studio details:', renderError);
+            window.showNotification('Erreur d\'affichage des détails', 'error');
+        }
     } catch (error) {
         console.error('Error loading studio details:', error);
         console.log('Attempted ID:', studioId);
@@ -61,6 +65,21 @@ function updateStudioDetails(studio) {
         statusBadge.innerHTML = '<span class="badge-large available"><i class="fas fa-check-circle"></i> Disponible</span>';
     } else {
         statusBadge.innerHTML = '<span class="badge-large reserved"><i class="fas fa-times-circle"></i> Réservé</span>';
+    }
+
+    // Update Image
+    const mainImageContainer = document.querySelector('.main-image');
+    if (mainImageContainer && studio.image) {
+        mainImageContainer.innerHTML = `
+            <img src="${studio.image}" alt="${studio.name}" style="width: 100%; height: 100%; object-fit: cover;">
+            <div class="gallery-overlay">
+                <button class="favorite-btn-large" id="favoriteBtnDetail" data-studio-id="${studio.id}">
+                    <i class="${window.AppState.isFavorite(studio.id) ? 'fas' : 'far'} fa-heart"></i>
+                </button>
+            </div>
+        `;
+        // Re-initialize favorite button since we replaced the HTML
+        initFavoriteButton();
     }
 
     // Update price
@@ -281,6 +300,93 @@ function initBookingForm(studioId) {
             } finally {
                 bookingBtn.classList.remove('loading');
                 bookingBtn.disabled = false;
+            }
+        });
+    }
+}
+async function initReviews(studioId) {
+    const reviewsList = document.getElementById('reviewsList');
+    const reviewForm = document.getElementById('reviewForm');
+    const stars = document.querySelectorAll('.star-rating i');
+    const ratingInput = document.getElementById('ratingInput');
+
+    if (!reviewsList) return;
+
+    // Load initial reviews
+    async function loadReviews() {
+        try {
+            const reviews = await API.get(`/items/${studioId}/reviews`);
+            if (reviews.length === 0) {
+                reviewsList.innerHTML = '<p class="no-reviews">Aucun avis pour le moment.</p>';
+                return;
+            }
+
+            reviewsList.innerHTML = reviews.map(review => `
+                <div class="review-card" style="padding: 1rem; background: var(--bg-body); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <strong>${review.username}</strong>
+                        <div class="stars" style="color: #f59e0b;">
+                            ${Array(5).fill(0).map((_, i) => `<i class="${i < review.rating ? 'fas' : 'far'} fa-star"></i>`).join('')}
+                        </div>
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">${review.comment || 'Pas de commentaire.'}</p>
+                    <small style="color: var(--text-muted);">${window.formatDate(review.created_at)}</small>
+                </div>
+            `).join('');
+        } catch (error) {
+            console.error('Error loading reviews:', error);
+            reviewsList.innerHTML = '<p class="error">Erreur lors du chargement des avis.</p>';
+        }
+    }
+
+    loadReviews();
+
+    // Star rating interaction
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            const rating = star.dataset.rating;
+            ratingInput.value = rating;
+
+            // Update UI
+            stars.forEach(s => {
+                const sRating = s.dataset.rating;
+                if (sRating <= rating) {
+                    s.classList.remove('far');
+                    s.classList.add('fas');
+                } else {
+                    s.classList.remove('fas');
+                    s.classList.add('far');
+                }
+            });
+        });
+    });
+
+    // Form submission
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!window.AppState.isAuthenticated) {
+                window.showNotification('Connectez-vous pour laisser un avis', 'warning');
+                return;
+            }
+
+            const rating = ratingInput.value;
+            const comment = document.getElementById('reviewComment').value;
+
+            if (!rating) {
+                window.showNotification('Veuillez donner une note', 'warning');
+                return;
+            }
+
+            try {
+                await API.post(`/items/${studioId}/reviews`, { rating: parseInt(rating), comment });
+                window.showNotification('Merci pour votre avis !', 'success');
+                reviewForm.reset();
+                stars.forEach(s => { s.classList.remove('fas'); s.classList.add('far'); });
+                loadReviews();
+            } catch (error) {
+                window.showNotification(error.message || 'Erreur lors de l\'envoi de l\'avis', 'error');
             }
         });
     }
