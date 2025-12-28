@@ -4,6 +4,32 @@
  */
 
 // ========================================
+// Cookie Helper Functions
+// ========================================
+const CookieManager = {
+    set(name, value, days = 7) {
+        const expires = new Date();
+        expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+        document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Strict`;
+    },
+
+    get(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    },
+
+    delete(name) {
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+    }
+};
+
+// ========================================
 // API Helper
 // ========================================
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -12,7 +38,7 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
 
 const API = {
     async request(endpoint, method = 'GET', body = null) {
-        const token = localStorage.getItem('token');
+        const token = CookieManager.get('token');
         const headers = {
             'Content-Type': 'application/json'
         };
@@ -67,7 +93,7 @@ const AppState = {
             try {
                 const user = await API.get('/auth/me');
                 this.user = user;
-                this.saveUser(user, localStorage.getItem('token')); // Update stored user
+                this.saveUser(user, CookieManager.get('token')); // Update stored user
             } catch (e) {
                 // Token invalid
                 this.logout();
@@ -79,7 +105,7 @@ const AppState = {
     loadFromStorage() {
         const userData = localStorage.getItem('user');
         const favoritesData = localStorage.getItem('favorites');
-        const token = localStorage.getItem('token');
+        const token = CookieManager.get('token');
 
         if (userData && token) {
             this.user = JSON.parse(userData);
@@ -95,7 +121,7 @@ const AppState = {
         this.user = user;
         this.isAuthenticated = true;
         localStorage.setItem('user', JSON.stringify(user));
-        localStorage.setItem('token', token);
+        CookieManager.set('token', token, 7); // Token expires in 7 days
         this.updateUI();
     },
 
@@ -104,7 +130,7 @@ const AppState = {
         this.isAuthenticated = false;
         this.favorites = [];
         localStorage.removeItem('user');
-        localStorage.removeItem('token');
+        CookieManager.delete('token'); // Remove token from cookie
         localStorage.removeItem('favorites');
         this.updateUI();
         window.location.href = 'index.html';
