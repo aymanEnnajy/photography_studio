@@ -57,7 +57,7 @@ function updateStudioDetails(studio) {
     document.getElementById('studioNameLarge').textContent = studio.name;
 
     // Update location
-    document.getElementById('studioLocation').textContent = `${studio.city}, France`;
+    document.getElementById('studioLocation').textContent = `${studio.city}, Maroc`;
 
     // Update status
     const statusBadge = document.getElementById('studioStatus');

@@ -197,20 +197,21 @@ app.get('/api/items/:id', async (c) => {
 // Create Studio (Protected)
 app.post('/api/items', authMiddleware, async (c) => {
     const user = c.get('user');
-    const { name, services, price, city, equipments, status, image, description } = await c.req.json();
+    const { name, services, price, city, equipments, equipment, status, image, description } = await c.req.json();
 
     if (!name || !price || !city) {
         return c.json({ error: 'Missing required fields' }, 400);
     }
 
     const servicesStr = Array.isArray(services) ? services.join(',') : (services || '');
-    const equipmentsStr = Array.isArray(equipments) ? equipments.join(',') : (equipments || '');
+    // Handle both 'equipment' and 'equipments' field names
+    const equipmentsStr = Array.isArray(equipments || equipment) ? (equipments || equipment).join(',') : (equipments || equipment || '');
 
     try {
         const result = await c.env.DB.prepare(
-            `INSERT INTO studios (name, services, price_per_hour, city, equipments, status, image, created_by) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-        ).bind(name, servicesStr, price, city, equipmentsStr, status || 'available', image, user.id).run();
+            `INSERT INTO studios (name, services, price_per_hour, city, equipments, status, image, description, created_by) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        ).bind(name, servicesStr, price, city, equipmentsStr, status || 'available', image, description || '', user.id).run();
 
         return c.json({ message: 'Studio created successfully', id: result.meta.last_row_id }, 201);
     } catch (e) {
@@ -239,14 +240,17 @@ app.put('/api/items/:id', authMiddleware, async (c) => {
     if (updates.city) { fields.push('city = ?'); values.push(updates.city); }
     if (updates.price) { fields.push('price_per_hour = ?'); values.push(updates.price); }
     if (updates.status) { fields.push('status = ?'); values.push(updates.status); }
-    if (updates.image) { fields.push('image = ?'); values.push(updates.image); }
+    if (updates.image !== undefined) { fields.push('image = ?'); values.push(updates.image); }
+    if (updates.description !== undefined) { fields.push('description = ?'); values.push(updates.description); }
     if (updates.services) {
         fields.push('services = ?');
         values.push(Array.isArray(updates.services) ? updates.services.join(',') : updates.services);
     }
-    if (updates.equipments) {
+    // Handle both 'equipment' and 'equipments' field names
+    if (updates.equipments || updates.equipment) {
         fields.push('equipments = ?');
-        values.push(Array.isArray(updates.equipments) ? updates.equipments.join(',') : updates.equipments);
+        const equipmentData = updates.equipments || updates.equipment;
+        values.push(Array.isArray(equipmentData) ? equipmentData.join(',') : equipmentData);
     }
 
     if (fields.length === 0) return c.json({ message: 'No changes' });

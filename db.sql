@@ -25,6 +25,7 @@ CREATE TABLE studios (
     equipments TEXT,
     status TEXT CHECK(status IN ('available', 'reserved')) DEFAULT 'available',
     image TEXT,
+    description TEXT,
     created_by INTEGER NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
