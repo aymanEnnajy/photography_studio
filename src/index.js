@@ -281,9 +281,16 @@ app.delete('/api/items/:id', authMiddleware, async (c) => {
     }
 
     try {
+        // Delete dependencies first (SQLite doesn't always have CASCADE enabled or configured for all tables)
+        await c.env.DB.prepare('DELETE FROM bookings WHERE item_id = ?').bind(id).run();
+        await c.env.DB.prepare('DELETE FROM reviews WHERE studio_id = ?').bind(id).run();
+        // favorites already has ON DELETE CASCADE in schema, but being explicit is safer
+        await c.env.DB.prepare('DELETE FROM favorites WHERE studio_id = ?').bind(id).run();
+
         await c.env.DB.prepare('DELETE FROM studios WHERE id = ?').bind(id).run();
         return c.json({ message: 'Studio deleted successfully' });
     } catch (e) {
+        console.error('Delete error:', e.message);
         return c.json({ error: 'Delete failed', details: e.message }, 500);
     }
 });
