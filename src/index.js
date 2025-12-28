@@ -120,7 +120,8 @@ app.get('/api/test-db', async (c) => {
 app.get('/api/items', async (c) => {
     const { category, city, status, priceMax, search } = c.req.query();
 
-    let query = 'SELECT * FROM studios WHERE 1=1';
+    // Use explicit columns to avoid errors if schema differs
+    let query = 'SELECT id, name, services, price_per_hour, city, equipments, status, image, description, created_by, created_at FROM studios WHERE 1=1';
     const params = [];
 
     if (category && category !== 'all') {
