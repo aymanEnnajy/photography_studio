@@ -153,6 +153,16 @@ app.get('/api/items', async (c) => {
     query += ' ORDER BY created_at DESC';
 
     try {
+        // Auto-update expired reservations BEFORE fetching (safe to fail if column doesn't exist)
+        try {
+            const today = new Date().toISOString().split('T')[0];
+            await c.env.DB.prepare(
+                "UPDATE studios SET status = 'available', reserved_until = NULL WHERE status = 'reserved' AND reserved_until < ? AND reserved_until IS NOT NULL"
+            ).bind(today).run();
+        } catch (updateError) {
+            console.log('Auto-update skipped:', updateError.message);
+        }
+
         const { results } = await c.env.DB.prepare(query).bind(...params).all();
         return c.json(results);
     } catch (e) {
@@ -198,7 +208,7 @@ app.get('/api/items/:id', async (c) => {
 // Create Studio (Protected)
 app.post('/api/items', authMiddleware, async (c) => {
     const user = c.get('user');
-    const { name, services, price, city, equipments, equipment, status, image, description } = await c.req.json();
+    const { name, services, price, city, equipments, equipment, status, image, description, reservedUntil } = await c.req.json();
 
     if (!name || !price || !city) {
         return c.json({ error: 'Missing required fields' }, 400);
@@ -210,9 +220,9 @@ app.post('/api/items', authMiddleware, async (c) => {
 
     try {
         const result = await c.env.DB.prepare(
-            `INSERT INTO studios (name, services, price_per_hour, city, equipments, status, image, description, created_by) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-        ).bind(name, servicesStr, price, city, equipmentsStr, status || 'available', image, description || '', user.id).run();
+            `INSERT INTO studios (name, services, price_per_hour, city, equipments, status, image, description, created_by, reserved_until) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        ).bind(name, servicesStr, price, city, equipmentsStr, status || 'available', image, description || '', user.id, reservedUntil || null).run();
 
         return c.json({ message: 'Studio created successfully', id: result.meta.last_row_id }, 201);
     } catch (e) {
@@ -252,6 +262,10 @@ app.put('/api/items/:id', authMiddleware, async (c) => {
         fields.push('equipments = ?');
         const equipmentData = updates.equipments || updates.equipment;
         values.push(Array.isArray(equipmentData) ? equipmentData.join(',') : equipmentData);
+    }
+    if (updates.reservedUntil !== undefined) {
+        fields.push('reserved_until = ?');
+        values.push(updates.reservedUntil || null);
     }
 
     if (fields.length === 0) return c.json({ message: 'No changes' });
@@ -366,13 +380,21 @@ app.post('/api/bookings', authMiddleware, async (c) => {
     }
 
     try {
-        // Check availability
+        // Check availability (both existing bookings AND long-term reservations)
+        const studio = await c.env.DB.prepare(
+            "SELECT status, reserved_until FROM studios WHERE id = ?"
+        ).bind(itemId).first();
+
+        if (studio && studio.status === 'reserved' && studio.reserved_until && date <= studio.reserved_until) {
+            return c.json({ error: 'Ce studio est réservé par le propriétaire jusqu\'au ' + studio.reserved_until }, 409);
+        }
+
         const existing = await c.env.DB.prepare(
             'SELECT id FROM bookings WHERE item_id = ? AND date = ? AND status != "cancelled"'
         ).bind(itemId, date).first();
 
         if (existing) {
-            return c.json({ error: 'Date already booked' }, 409);
+            return c.json({ error: 'Date déjà réservée' }, 409);
         }
 
         const result = await c.env.DB.prepare(

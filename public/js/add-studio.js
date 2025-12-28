@@ -31,6 +31,24 @@ function checkAuthAndInit() {
 
     initForm();
     initPreview();
+
+    // Add listener for status change to show/hide reservedUntil
+    const statusSelect = document.getElementById('status');
+    const reservedUntilGroup = document.getElementById('reservedUntilGroup');
+    const reservedUntilInput = document.getElementById('reservedUntil');
+
+    if (statusSelect) {
+        statusSelect.addEventListener('change', () => {
+            if (statusSelect.value === 'reserved') {
+                reservedUntilGroup.style.display = 'block';
+                reservedUntilInput.required = true;
+            } else {
+                reservedUntilGroup.style.display = 'none';
+                reservedUntilInput.required = false;
+                reservedUntilInput.value = '';
+            }
+        });
+    }
 }
 
 function updatePageForEditMode() {
@@ -51,6 +69,13 @@ async function loadStudioForEdit(studioId) {
         document.getElementById('status').value = studio.status;
         document.getElementById('imageUrl').value = studio.image || '';
         document.getElementById('description').value = studio.description || '';
+
+        // Handle reservedUntil
+        if (studio.status === 'reserved' && studio.reserved_until) {
+            document.getElementById('reservedUntil').value = studio.reserved_until;
+            document.getElementById('reservedUntilGroup').style.display = 'block';
+            document.getElementById('reservedUntil').required = true;
+        }
 
         // Set services
         const services = studio.services ? studio.services.split(',') : [];
@@ -102,7 +127,8 @@ async function handleFormSubmit(e) {
         image: document.getElementById('imageUrl').value,
         description: document.getElementById('description').value,
         services: Array.from(document.querySelectorAll('input[name="services"]:checked')).map(cb => cb.value),
-        equipment: Array.from(document.querySelectorAll('input[name="equipment"]:checked')).map(cb => cb.value)
+        equipment: Array.from(document.querySelectorAll('input[name="equipment"]:checked')).map(cb => cb.value),
+        reservedUntil: document.getElementById('reservedUntil').value || null
     };
 
     // Validate

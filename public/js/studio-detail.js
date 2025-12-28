@@ -64,7 +64,12 @@ function updateStudioDetails(studio) {
     if (studio.status === 'available') {
         statusBadge.innerHTML = '<span class="badge-large available"><i class="fas fa-check-circle"></i> Disponible</span>';
     } else {
-        statusBadge.innerHTML = '<span class="badge-large reserved"><i class="fas fa-times-circle"></i> Réservé</span>';
+        let statusHtml = `<span class="badge-large reserved"><i class="fas fa-times-circle"></i> Réservé`;
+        if (studio.reserved_until) {
+            statusHtml += ` jusqu'au ${studio.reserved_until}`;
+        }
+        statusHtml += `</span>`;
+        statusBadge.innerHTML = statusHtml;
     }
 
     // Update Image
