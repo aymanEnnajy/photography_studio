@@ -519,8 +519,9 @@ app.get('/api/items/:id/reviews', async (c) => {
 // Scraping API (n8n Integration)
 // ========================================
 
-app.post('/api/scraping/trigger', authMiddleware, async (c) => {
-    const { city, keyword } = await c.req.json();
+app.get('/api/scraping/trigger', authMiddleware, async (c) => {
+    const city = c.req.query('city');
+    const keyword = c.req.query('keyword');
     const user = c.get('user');
 
     if (!city || !keyword) {
@@ -535,16 +536,14 @@ app.post('/api/scraping/trigger', authMiddleware, async (c) => {
     try {
         console.log(`[Scraping] Triggering n8n for ${keyword} in ${city} for user ${user.email}`);
 
-        const response = await fetch(webhookUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                city,
-                keyword,
-                userEmail: user.email
-            })
+        // Construct URL with query parameters for GET request to n8n
+        const url = new URL(webhookUrl);
+        url.searchParams.append('city', city);
+        url.searchParams.append('keyword', keyword);
+        url.searchParams.append('userEmail', user.email);
+
+        const response = await fetch(url.toString(), {
+            method: 'GET'
         });
 
         if (!response.ok) {

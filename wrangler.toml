@@ -10,7 +10,7 @@ database_id = "a771f874-6bc7-4c78-b2a5-b881581f5810"
 
 [vars]
 JWT_SECRET = "super-secret-jwt-key-change-me"
-N8N_WEBHOOK_URL = "https://n8n-photography-studio.app/webhook/scraping"
+N8N_WEBHOOK_URL = "https://n8n.zackdev.io/webhook/ab6356f0-e889-4f77-a1ae-8bcfd93254d0"
 
 [site]
 bucket = "./public"

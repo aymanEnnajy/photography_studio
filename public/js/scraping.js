@@ -3,11 +3,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const scrapingOverlay = document.getElementById('scrapingOverlay');
     const scrapingResult = document.getElementById('scrapingResult');
     const downloadLink = document.getElementById('downloadLink');
-    const token = localStorage.getItem('token');
 
-    // Protect the page
-    if (!token) {
-        alert('Vous devez être connecté pour accéder à cette page.');
+    // Protect the page using AppState
+    if (!window.AppState.isAuthenticated) {
+        window.showNotification('Vous devez être connecté pour accéder à cette page.', 'warning');
         window.location.href = 'login.html';
         return;
     }
@@ -23,16 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
         scrapingOverlay.style.display = 'flex';
 
         try {
-            const response = await fetch('/api/scraping/trigger', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ city, keyword })
-            });
-
-            const data = await response.json();
+            // Use the API helper which handles tokens from cookies automatically
+            const data = await window.API.get(`/scraping/trigger?city=${encodeURIComponent(city)}&keyword=${encodeURIComponent(keyword)}`);
 
             if (data.success && data.sheetUrl) {
                 // Show success state
@@ -44,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Scraping error:', error);
-            alert('Erreur: ' + error.message);
+            window.showNotification(error.message, 'error');
             // Reset UI
             scrapingOverlay.style.display = 'none';
             scrapingForm.style.display = 'block';
