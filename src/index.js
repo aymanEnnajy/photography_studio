@@ -515,6 +515,58 @@ app.get('/api/items/:id/reviews', async (c) => {
     }
 });
 
+// ========================================
+// Scraping API (n8n Integration)
+// ========================================
+
+app.post('/api/scraping/trigger', authMiddleware, async (c) => {
+    const { city, keyword } = await c.req.json();
+    const user = c.get('user');
+
+    if (!city || !keyword) {
+        return c.json({ error: 'City and keyword are required' }, 400);
+    }
+
+    const webhookUrl = c.env.N8N_WEBHOOK_URL;
+    if (!webhookUrl) {
+        return c.json({ error: 'n8n Webhook URL is not configured' }, 500);
+    }
+
+    try {
+        console.log(`[Scraping] Triggering n8n for ${keyword} in ${city} for user ${user.email}`);
+
+        const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                city,
+                keyword,
+                userEmail: user.email
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`[Scraping] n8n error: ${response.status} - ${errorText}`);
+            return c.json({ error: 'Failed to trigger scraping workflow' }, 502);
+        }
+
+        const data = await response.json();
+
+        // data should contain { success: true, sheetUrl: "..." }
+        return c.json({
+            success: true,
+            message: 'Scraping finished successfully',
+            sheetUrl: data.sheetUrl
+        });
+    } catch (error) {
+        console.error('[Scraping] Error:', error);
+        return c.json({ error: 'Internal server error during scraping trigger', details: error.message }, 500);
+    }
+});
+
 // Serve static files
 app.get('/css/*', serveStatic({ manifest }))
 app.get('/js/*', serveStatic({ manifest }))
@@ -523,7 +575,7 @@ app.get('/js/*', serveStatic({ manifest }))
 const htmlFiles = [
     'index.html', 'studios.html', 'studio-detail.html',
     'login.html', 'register.html', 'favorites.html',
-    'add-studio.html', 'my-bookings.html'
+    'add-studio.html', 'my-bookings.html', 'scraping.html'
 ]
 
 htmlFiles.forEach(file => {
