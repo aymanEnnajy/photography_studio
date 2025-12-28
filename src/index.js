@@ -549,7 +549,11 @@ app.get('/api/scraping/trigger', authMiddleware, async (c) => {
         if (!response.ok) {
             const errorText = await response.text();
             console.error(`[Scraping] n8n error: ${response.status} - ${errorText}`);
-            return c.json({ error: 'Failed to trigger scraping workflow' }, 502);
+            return c.json({
+                error: 'Failed to trigger scraping workflow',
+                n8nStatus: response.status,
+                n8nError: errorText
+            }, 502);
         }
 
         const data = await response.json();

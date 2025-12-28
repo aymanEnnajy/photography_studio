@@ -35,7 +35,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Scraping error:', error);
-            window.showNotification(error.message, 'error');
+
+            let errorMsg = error.message;
+            if (error.n8nStatus) {
+                errorMsg += ` (Status: ${error.n8nStatus})`;
+            }
+            if (error.n8nError) {
+                errorMsg += `\nn8n Error: ${error.n8nError}`;
+            }
+
+            window.showNotification(errorMsg, 'error');
             // Reset UI
             scrapingOverlay.style.display = 'none';
             scrapingForm.style.display = 'block';
