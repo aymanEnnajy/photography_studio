@@ -285,6 +285,16 @@ function initBookingForm(studioId) {
     const bookingBtn = document.getElementById('bookingBtn');
 
     if (bookingForm) {
+        // Add End Date field to the form dynamically
+        const dateInputContainer = bookingDate.parentElement;
+        const endDateHTML = `
+            <div style="flex: 1; min-width: 200px; margin-top: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Date de fin (optionnel)</label>
+                <input type="date" id="bookingEndDate" class="form-input" min="${new Date().toISOString().split('T')[0]}">
+            </div>
+        `;
+        dateInputContainer.insertAdjacentHTML('afterend', endDateHTML);
+
         bookingForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -296,17 +306,28 @@ function initBookingForm(studioId) {
                 return;
             }
 
-            const date = bookingDate.value;
-            if (!date) return;
+            const startDate = bookingDate.value;
+            const endDate = document.getElementById('bookingEndDate').value;
+
+            if (!startDate) return;
+            if (endDate && endDate < startDate) {
+                window.showNotification('La date de fin doit être après la date de début', 'error');
+                return;
+            }
 
             bookingBtn.classList.add('loading');
             bookingBtn.disabled = true;
 
             try {
-                await API.post('/bookings', { itemId: studioId, date });
+                await API.post('/bookings', {
+                    itemId: studioId,
+                    date: startDate,
+                    endDate: endDate || startDate
+                });
                 window.showNotification('Réservation confirmée !', 'success');
                 bookingForm.reset();
-                // Optionally refresh availability here
+                // Reload to show correct status
+                setTimeout(() => window.location.reload(), 1500);
             } catch (error) {
                 console.error(error);
                 window.showNotification(error.message || 'Erreur lors de la réservation', 'error');

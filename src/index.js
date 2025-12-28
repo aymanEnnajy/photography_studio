@@ -153,9 +153,9 @@ app.get('/api/items', async (c) => {
     query += ' ORDER BY created_at DESC';
 
     try {
-        // Auto-update expired reservations BEFORE fetching (safe to fail if column doesn't exist)
+        const today = new Date().toISOString().split('T')[0];
+        // Auto-update expired MANUAL reservations
         try {
-            const today = new Date().toISOString().split('T')[0];
             await c.env.DB.prepare(
                 "UPDATE studios SET status = 'available', reserved_until = NULL WHERE status = 'reserved' AND reserved_until < ? AND reserved_until IS NOT NULL"
             ).bind(today).run();
@@ -164,7 +164,22 @@ app.get('/api/items', async (c) => {
         }
 
         const { results } = await c.env.DB.prepare(query).bind(...params).all();
-        return c.json(results);
+
+        // Dynamically calculate status based on current bookings
+        const enrichedResults = await Promise.all(results.map(async (studio) => {
+            if (studio.status === 'reserved') return studio; // Already reserved by owner
+
+            const currentBooking = await c.env.DB.prepare(
+                'SELECT id FROM bookings WHERE item_id = ? AND status != "cancelled" AND ? BETWEEN date AND end_date'
+            ).bind(studio.id, today).first();
+
+            if (currentBooking) {
+                return { ...studio, status: 'reserved' };
+            }
+            return studio;
+        }));
+
+        return c.json(enrichedResults);
     } catch (e) {
         return c.json({ error: 'Failed to fetch studios', details: e.message }, 500);
     }
@@ -195,6 +210,18 @@ app.get('/api/items/:id', async (c) => {
         if (!studio) {
             console.warn(`[API] Studio with ID "${id}" not found in database`);
             return c.json({ error: 'Studio not found' }, 404);
+        }
+
+        // Dynamic status for single studio
+        const today = new Date().toISOString().split('T')[0];
+        if (studio.status !== 'reserved') {
+            const currentBooking = await c.env.DB.prepare(
+                'SELECT id FROM bookings WHERE item_id = ? AND status != "cancelled" AND ? BETWEEN date AND end_date'
+            ).bind(studio.id, today).first();
+
+            if (currentBooking) {
+                studio.status = 'reserved';
+            }
         }
 
         console.log(`[API] Studio found: ${studio.name}`);
@@ -372,38 +399,47 @@ app.get('/api/favorites/my-favorites', authMiddleware, async (c) => {
 
 // Create Booking
 app.post('/api/bookings', authMiddleware, async (c) => {
-    const { itemId, date } = await c.req.json();
+    const { itemId, date, endDate } = await c.req.json();
     const user = c.get('user');
 
     if (!itemId || !date) {
-        return c.json({ error: 'Studio ID and date are required' }, 400);
+        return c.json({ error: 'Studio ID and start date are required' }, 400);
     }
 
+    const finalEndDate = endDate || date; // Support single day booking
+
     try {
-        // Check availability (both existing bookings AND long-term reservations)
+        // 1. Check owner's long-term reservation
         const studio = await c.env.DB.prepare(
             "SELECT status, reserved_until FROM studios WHERE id = ?"
         ).bind(itemId).first();
 
-        if (studio && studio.status === 'reserved' && studio.reserved_until && date <= studio.reserved_until) {
-            return c.json({ error: 'Ce studio est réservé par le propriétaire jusqu\'au ' + studio.reserved_until }, 409);
+        if (studio && studio.status === 'reserved' && studio.reserved_until) {
+            // Conflict if (booking_start <= reserved_until)
+            if (date <= studio.reserved_until) {
+                return c.json({ error: 'Ce studio est réservé par le propriétaire jusqu\'au ' + studio.reserved_until }, 409);
+            }
         }
 
-        const existing = await c.env.DB.prepare(
-            'SELECT id FROM bookings WHERE item_id = ? AND date = ? AND status != "cancelled"'
-        ).bind(itemId, date).first();
+        // 2. Check overlap with existing user bookings
+        const conflict = await c.env.DB.prepare(`
+            SELECT id FROM bookings 
+            WHERE item_id = ? AND status != "cancelled" 
+            AND NOT (end_date < ? OR date > ?)
+        `).bind(itemId, date, finalEndDate).first();
 
-        if (existing) {
-            return c.json({ error: 'Date déjà réservée' }, 409);
+        if (conflict) {
+            return c.json({ error: 'Ce studio est déjà réservé pour tout ou partie de cette période' }, 409);
         }
 
         const result = await c.env.DB.prepare(
-            'INSERT INTO bookings (user_id, item_id, date, status) VALUES (?, ?, ?, ?)'
-        ).bind(user.id, itemId, date, 'confirmed').run();
+            'INSERT INTO bookings (user_id, item_id, date, end_date, status) VALUES (?, ?, ?, ?, ?)'
+        ).bind(user.id, itemId, date, finalEndDate, 'confirmed').run();
 
-        return c.json({ message: 'Booking confirmed', id: result.meta.last_row_id }, 201);
+        return c.json({ message: 'Réservation confirmée', id: result.meta.last_row_id }, 201);
     } catch (error) {
-        return c.json({ error: 'Failed to create booking' }, 500);
+        console.error('Booking error:', error);
+        return c.json({ error: 'Échec de la réservation', details: error.message }, 500);
     }
 });
 
