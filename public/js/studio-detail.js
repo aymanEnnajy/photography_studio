@@ -254,13 +254,21 @@ function initStudioActions() {
     }
 
     if (deleteBtn) {
-        deleteBtn.addEventListener('click', () => {
+        deleteBtn.addEventListener('click', async () => {
             if (confirm('Êtes-vous sûr de vouloir supprimer ce studio ?')) {
-                // Simulate deletion
-                window.showNotification('Studio supprimé avec succès', 'success');
-                setTimeout(() => {
-                    window.location.href = 'studios.html';
-                }, 1500);
+                const urlParams = new URLSearchParams(window.location.search);
+                const studioId = urlParams.get('id');
+
+                try {
+                    await API.delete(`/items/${studioId}`);
+                    window.showNotification('Studio supprimé avec succès', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'studios.html';
+                    }, 1500);
+                } catch (error) {
+                    console.error('Delete failed:', error);
+                    window.showNotification(error.message || 'Erreur lors de la suppression', 'error');
+                }
             }
         });
     }
