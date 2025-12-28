@@ -60,13 +60,15 @@ const API = {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || data.message || 'Une erreur est survenue');
+                const error = new Error(data.error || data.message || 'Une erreur est survenue');
+                error.data = data; // Attach full response data for debugging
+                throw error;
             }
 
             return data;
         } catch (error) {
             console.error('API Error:', error);
-            throw error; // Re-throw to be handled by caller
+            throw error;
         }
     },
 

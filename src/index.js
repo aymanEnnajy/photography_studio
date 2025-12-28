@@ -556,7 +556,13 @@ app.get('/api/scraping/trigger', authMiddleware, async (c) => {
             }, 502);
         }
 
-        const data = await response.json();
+        let data;
+        try {
+            data = await response.json();
+        } catch (e) {
+            console.error('[Scraping] n8n response is not JSON');
+            return c.json({ error: 'n8n response is not a valid JSON' }, 502);
+        }
 
         // data should contain { success: true, sheetUrl: "..." }
         return c.json({
