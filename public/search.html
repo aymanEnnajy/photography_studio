@@ -276,8 +276,8 @@
     </div>
 
    <script>
-    // ⚠️ REMPLACEZ PAR L'URL AVEC PROXY CORS ⚠️
-const N8N_WEBHOOK_URL = 'https://corsproxy.io/?https://n8n.zackdev.io/webhook/scraping';
+  // ⚠️ UTILISEZ VOTRE WORKER CLOUDFLARE ⚠️
+const PROXY_URL = 'https://n8n-proxy.ayman93011.workers.dev/';
 
 function startSearch() {
     const keyword = document.getElementById('keyword').value.trim();
@@ -307,15 +307,15 @@ function startSearch() {
     
     // Afficher les données envoyées dans la console
     console.log('📤 Données envoyées à n8n:', requestData);
-    console.log('🌐 URL du webhook avec proxy:', N8N_WEBHOOK_URL);
+    console.log('🌐 URL de votre Worker Cloudflare:', PROXY_URL);
     
-    // Envoyer la requête AVEC PROXY CORS
-    fetch(N8N_WEBHOOK_URL, {
+    // Envoyer la requête via VOTRE Worker Cloudflare
+    fetch(PROXY_URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest' // Important pour certains proxies
+            'Accept': 'application/json'
+            // 'X-Requested-With' n'est plus nécessaire avec votre propre Worker
         },
         body: JSON.stringify(requestData)
     })
@@ -336,7 +336,7 @@ function startSearch() {
         return response.json();
     })
     .then(data => {
-        console.log('✅ Données reçues de n8n:', data);
+        console.log('✅ Données reçues via votre Worker:', data);
         
         // Cacher le chargement
         document.getElementById('loading').style.display = 'none';
@@ -373,7 +373,7 @@ function startSearch() {
                 <pre>${JSON.stringify(requestData, null, 2)}</pre><br>
                 <strong>Données reçues :</strong><br>
                 <pre>${JSON.stringify(data, null, 2)}</pre><br>
-                <strong>Proxy utilisé :</strong> corsproxy.io
+                <strong>Proxy utilisé :</strong> Votre Worker Cloudflare (${PROXY_URL})
             `;
             
             // Ouvrir automatiquement Excel après 1 seconde (optionnel)
@@ -398,22 +398,25 @@ function startSearch() {
         // Cacher le chargement
         document.getElementById('loading').style.display = 'none';
         
-        // Essayer un proxy alternatif si le premier échoue
+        // Messages d'erreur spécifiques
         let errorMessage = `Erreur de connexion : ${error.message}`;
         
         if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
             errorMessage = `
-                ❌ Impossible de se connecter via proxy.<br><br>
-                <strong>Essayez un autre proxy :</strong><br>
-                <button onclick="switchProxy(1)" style="margin: 5px; padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                    Proxy 1 (corsproxy.io)
-                </button>
-                <button onclick="switchProxy(2)" style="margin: 5px; padding: 8px 15px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                    Proxy 2 (cors-anywhere)
-                </button>
-                <button onclick="switchProxy(3)" style="margin: 5px; padding: 8px 15px; background: #FF9800; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                    Proxy 3 (thingproxy)
-                </button>
+                ❌ Impossible de se connecter à votre Worker Cloudflare.<br><br>
+                <strong>Vérifiez :</strong><br>
+                1. Votre Worker est bien déployé : ${PROXY_URL}<br>
+                2. Le code du Worker est correct<br>
+                3. Les logs du Worker dans Cloudflare Dashboard
+            `;
+        } else if (error.message.includes('500') || error.message.includes('Proxy error')) {
+            errorMessage = `
+                ❌ Votre Worker Cloudflare a une erreur interne.<br><br>
+                <strong>Vérifiez les logs :</strong><br>
+                1. Allez dans Cloudflare Dashboard<br>
+                2. Workers & Pages → n8n-proxy<br>
+                3. Cliquez sur "Logs"<br>
+                4. Voir les erreurs en temps réel
             `;
         }
         
@@ -422,26 +425,52 @@ function startSearch() {
         // Afficher les informations de débogage
         document.getElementById('debug-info').innerHTML = `
             <strong>Erreur :</strong> ${error.message}<br>
-            <strong>URL avec proxy :</strong> ${N8N_WEBHOOK_URL}<br>
+            <strong>URL Worker :</strong> ${PROXY_URL}<br>
             <strong>Données envoyées :</strong><br>
-            <pre>${JSON.stringify(requestData, null, 2)}</pre>
+            <pre>${JSON.stringify(requestData, null, 2)}</pre><br>
+            <strong>Test direct :</strong> <button onclick="testWorkerDirectly()" style="margin: 5px; padding: 5px 10px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                Tester le Worker directement
+            </button>
         `;
         document.getElementById('debug-info').style.display = 'block';
     });
 }
 
-// Fonction pour changer de proxy
+// Fonction pour tester le Worker directement
+function testWorkerDirectly() {
+    console.log('🧪 Test direct du Worker...');
+    
+    fetch(PROXY_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({city: 'Test', keyword: 'Test'})
+    })
+    .then(response => {
+        console.log('Test Worker - Status:', response.status);
+        console.log('Test Worker - Headers:', response.headers);
+        return response.text();
+    })
+    .then(text => {
+        console.log('Test Worker - Response:', text);
+        alert(`Test Worker:\nStatus: ${response?.status}\nResponse: ${text.substring(0, 200)}...`);
+    })
+    .catch(error => {
+        console.error('Test Worker - Error:', error);
+        alert('Test Worker échoué: ' + error.message);
+    });
+}
+
+// Fonction pour changer de proxy (gardée pour compatibilité)
 function switchProxy(proxyNumber) {
     const proxies = [
+        PROXY_URL, // Votre Worker
         'https://corsproxy.io/?https://n8n.zackdev.io/webhook/scraping',
-        'https://cors-anywhere.herokuapp.com/https://n8n.zackdev.io/webhook/scraping',
-        'https://thingproxy.freeboard.io/fetch/https://n8n.zackdev.io/webhook/scraping',
-        'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://n8n.zackdev.io/webhook/scraping')
+        'https://cors-anywhere.herokuapp.com/https://n8n.zackdev.io/webhook/scraping'
     ];
     
-    window.N8N_WEBHOOK_URL = proxies[proxyNumber - 1];
-    console.log(`🔄 Changement vers proxy ${proxyNumber}: ${window.N8N_WEBHOOK_URL}`);
-    alert(`Proxy changé vers l'option ${proxyNumber}. Essayez à nouveau.`);
+    window.PROXY_URL = proxies[proxyNumber - 1];
+    console.log(`🔄 Changement vers proxy ${proxyNumber}: ${window.PROXY_URL}`);
+    alert(`Proxy changé. Essayez à nouveau.`);
     
     // Cacher le message d'erreur
     document.getElementById('error-message').style.display = 'none';
@@ -469,22 +498,25 @@ document.getElementById('city').addEventListener('keypress', function(e) {
 
 // Test initial de connexion
 window.addEventListener('load', function() {
-    console.log('🌐 Test de connexion à n8n...');
+    console.log('🌐 Test de connexion à votre Worker...');
     
-    // Tester avec proxy
-    fetch(N8N_WEBHOOK_URL, {
+    // Tester le Worker avec une requête simple
+    fetch(PROXY_URL, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({city: 'test', keyword: 'test'})
     })
     .then(response => {
-        console.log('Test connexion - Status:', response.status);
+        console.log('Test Worker - Status:', response.status);
         if (response.status === 200) {
-            console.log('✅ Connexion via proxy OK');
+            console.log('✅ Connexion Worker OK');
+        } else {
+            console.warn('⚠️ Worker répond mais avec status:', response.status);
         }
     })
     .catch(error => {
-        console.warn('⚠️ Impossible de tester la connexion:', error.message);
+        console.warn('⚠️ Impossible de tester le Worker:', error.message);
+        console.warn('Vérifiez que votre Worker est bien déployé et actif.');
     });
 });
    </script>
