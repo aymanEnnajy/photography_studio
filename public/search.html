@@ -275,192 +275,218 @@
         </div>
     </div>
 
-    <script>
-        // ⚠️ REMPLACEZ CE LIEN PAR VOTRE WEBHOOK n8n ⚠️
-        const N8N_WEBHOOK_URL = 'https://n8n.zackdev.io/webhook/scraping';
+   <script>
+    // ⚠️ REMPLACEZ PAR L'URL AVEC PROXY CORS ⚠️
+const N8N_WEBHOOK_URL = 'https://corsproxy.io/?https://n8n.zackdev.io/webhook/scraping';
+
+function startSearch() {
+    const keyword = document.getElementById('keyword').value.trim();
+    const city = document.getElementById('city').value.trim();
+    
+    if (!keyword || !city) {
+        alert('Veuillez entrer un terme de recherche et une ville');
+        return;
+    }
+    
+    // Afficher le chargement, cacher les résultats et erreurs
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('result-container').style.display = 'none';
+    document.getElementById('error-message').style.display = 'none';
+    document.getElementById('debug-info').style.display = 'none';
+    
+    // Désactiver le bouton pendant la requête
+    const searchBtn = document.querySelector('.search-btn');
+    searchBtn.disabled = true;
+    searchBtn.textContent = 'Recherche en cours...';
+    
+    // Préparer les données EXACTEMENT comme dans Postman
+    const requestData = {
+        city: city,
+        keyword: keyword
+    };
+    
+    // Afficher les données envoyées dans la console
+    console.log('📤 Données envoyées à n8n:', requestData);
+    console.log('🌐 URL du webhook avec proxy:', N8N_WEBHOOK_URL);
+    
+    // Envoyer la requête AVEC PROXY CORS
+    fetch(N8N_WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest' // Important pour certains proxies
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => {
+        console.log('📥 Réponse reçue - Status:', response.status);
+        console.log('📥 Headers de la réponse:', response.headers);
         
-        function startSearch() {
-            const keyword = document.getElementById('keyword').value.trim();
-            const city = document.getElementById('city').value.trim();
-            
-            if (!keyword || !city) {
-                alert('Veuillez entrer un terme de recherche et une ville');
-                return;
-            }
-            
-            // Afficher le chargement, cacher les résultats et erreurs
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('result-container').style.display = 'none';
-            document.getElementById('error-message').style.display = 'none';
-            document.getElementById('debug-info').style.display = 'none';
-            
-            // Désactiver le bouton pendant la requête
-            const searchBtn = document.querySelector('.search-btn');
-            searchBtn.disabled = true;
-            searchBtn.textContent = 'Recherche en cours...';
-            
-            // Préparer les données EXACTEMENT comme dans Postman
-            const requestData = {
-                city: city,
-                keyword: keyword
-            };
-            
-            // Afficher les données envoyées dans la console
-            console.log('📤 Données envoyées à n8n:', requestData);
-            console.log('🌐 URL du webhook:', N8N_WEBHOOK_URL);
-            
-            // Envoyer la requête EXACTEMENT comme Postman
-            fetch(N8N_WEBHOOK_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json', // Exactement comme Postman
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(requestData) // Corps JSON
-            })
-            .then(response => {
-                console.log('📥 Réponse reçue - Status:', response.status);
-                console.log('📥 Headers de la réponse:', response.headers);
-                
-                // Réactiver le bouton
-                searchBtn.disabled = false;
-                searchBtn.textContent = 'Lancer la recherche et générer Excel';
-                
-                if (!response.ok) {
-                    // Si le status n'est pas 200-299
-                    return response.text().then(text => {
-                        throw new Error(`HTTP ${response.status}: ${text}`);
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('✅ Données reçues de n8n:', data);
-                
-                // Cacher le chargement
-                document.getElementById('loading').style.display = 'none';
-                
-                // Vérifier si la réponse est un succès
-                if (data.status === 'success' || data.success === true) {
-                    // Mettre à jour les liens de téléchargement
-                    const excelUrl = data.data?.download_links?.excel || data.downloads?.excel;
-                    const csvUrl = data.data?.download_links?.csv || data.downloads?.csv;
-                    const viewUrl = data.data?.view_online || data.view;
-                    
-                    document.getElementById('excel-link').href = excelUrl;
-                    document.getElementById('csv-link').href = csvUrl;
-                    document.getElementById('view-link').href = viewUrl;
-                    
-                    // Afficher les informations des résultats
-                    const sample = data.data?.sample_data || {};
-                    document.getElementById('result-info').innerHTML = `
-                        <div style="background: white; padding: 15px; border-radius: 10px; border-left: 4px solid #667eea;">
-                            <strong style="color: #333;">Exemple de résultat :</strong><br>
-                            <strong>🏢 Entreprise :</strong> ${sample.business || 'Non disponible'}<br>
-                            <strong>📍 Adresse :</strong> ${sample.address || 'Non disponible'}<br>
-                            <strong>⭐ Note :</strong> ${sample.rating || 'N/A'}/5<br>
-                            <strong>🕒 Généré le :</strong> ${new Date(data.timestamp).toLocaleString('fr-FR')}
-                        </div>
-                    `;
-                    
-                    // Afficher le conteneur des résultats
-                    document.getElementById('result-container').style.display = 'block';
-                    
-                    // Afficher les informations de débogage
-                    document.getElementById('debug-info').innerHTML = `
-                        <strong>Données envoyées :</strong><br>
-                        <pre>${JSON.stringify(requestData, null, 2)}</pre><br>
-                        <strong>Données reçues :</strong><br>
-                        <pre>${JSON.stringify(data, null, 2)}</pre>
-                    `;
-                    
-                    // Ouvrir automatiquement Excel après 1 seconde (optionnel)
-                    setTimeout(() => {
-                        if (excelUrl) {
-                            window.open(excelUrl, '_blank');
-                            console.log('📂 Fichier Excel ouvert:', excelUrl);
-                        }
-                    }, 1000);
-                    
-                } else {
-                    // Si n8n retourne une erreur
-                    showError(`Erreur du serveur: ${data.message || 'Réponse inattendue'}`);
-                }
-            })
-            .catch(error => {
-                console.error('❌ Erreur complète:', error);
-                
-                // Réactiver le bouton
-                searchBtn.disabled = false;
-                searchBtn.textContent = 'Lancer la recherche et générer Excel';
-                
-                // Cacher le chargement
-                document.getElementById('loading').style.display = 'none';
-                
-                // Afficher un message d'erreur détaillé
-                let errorMessage = `Erreur de connexion : ${error.message}`;
-                
-                // Messages d'erreur plus clairs
-                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-                    errorMessage = `
-                        ❌ Impossible de se connecter à n8n.<br><br>
-                        <strong>Causes possibles :</strong><br>
-                        1. Problème CORS (Cross-Origin)<br>
-                        2. n8n n'est pas accessible depuis internet<br>
-                        3. L'URL du webhook est incorrecte<br><br>
-                        <strong>URL essayée :</strong> ${N8N_WEBHOOK_URL}
-                    `;
-                }
-                
-                showError(errorMessage);
-                
-                // Afficher les informations de débogage
-                document.getElementById('debug-info').innerHTML = `
-                    <strong>Erreur :</strong> ${error.message}<br>
-                    <strong>URL :</strong> ${N8N_WEBHOOK_URL}<br>
-                    <strong>Données envoyées :</strong><br>
-                    <pre>${JSON.stringify(requestData, null, 2)}</pre>
-                `;
-                document.getElementById('debug-info').style.display = 'block';
+        // Réactiver le bouton
+        searchBtn.disabled = false;
+        searchBtn.textContent = 'Lancer la recherche et générer Excel';
+        
+        if (!response.ok) {
+            return response.text().then(text => {
+                console.error('❌ Réponse erreur:', text);
+                throw new Error(`HTTP ${response.status}: ${text.substring(0, 100)}...`);
             });
         }
+        return response.json();
+    })
+    .then(data => {
+        console.log('✅ Données reçues de n8n:', data);
         
-        function showError(message) {
-            const errorDiv = document.getElementById('error-message');
-            errorDiv.innerHTML = message;
-            errorDiv.style.display = 'block';
-        }
+        // Cacher le chargement
+        document.getElementById('loading').style.display = 'none';
         
-        function toggleDebug() {
-            const debugDiv = document.getElementById('debug-info');
-            debugDiv.style.display = debugDiv.style.display === 'block' ? 'none' : 'block';
-        }
-        
-        // Permettre d'appuyer sur Entrée pour lancer la recherche
-        document.getElementById('keyword').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') startSearch();
-        });
-        
-        document.getElementById('city').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') startSearch();
-        });
-        
-        // Test initial de connexion
-        window.addEventListener('load', function() {
-            console.log('🌐 Test de connexion à n8n...');
-            fetch(N8N_WEBHOOK_URL, {
-                method: 'OPTIONS'
-            })
-            .then(response => {
-                console.log('Test OPTIONS - Status:', response.status);
-                if (response.status === 200) {
-                    console.log('✅ Connexion n8n OK');
+        // Vérifier si la réponse est un succès
+        if (data.status === 'success' || data.success === true) {
+            // Mettre à jour les liens de téléchargement
+            const excelUrl = data.data?.download_links?.excel || data.downloads?.excel;
+            const csvUrl = data.data?.download_links?.csv || data.downloads?.csv;
+            const viewUrl = data.data?.view_online || data.view;
+            
+            document.getElementById('excel-link').href = excelUrl;
+            document.getElementById('csv-link').href = csvUrl;
+            document.getElementById('view-link').href = viewUrl;
+            
+            // Afficher les informations des résultats
+            const sample = data.data?.sample_data || {};
+            document.getElementById('result-info').innerHTML = `
+                <div style="background: white; padding: 15px; border-radius: 10px; border-left: 4px solid #667eea;">
+                    <strong style="color: #333;">Exemple de résultat :</strong><br>
+                    <strong>🏢 Entreprise :</strong> ${sample.business || 'Non disponible'}<br>
+                    <strong>📍 Adresse :</strong> ${sample.address || 'Non disponible'}<br>
+                    <strong>⭐ Note :</strong> ${sample.rating || 'N/A'}/5<br>
+                    <strong>🕒 Généré le :</strong> ${new Date(data.timestamp).toLocaleString('fr-FR')}
+                </div>
+            `;
+            
+            // Afficher le conteneur des résultats
+            document.getElementById('result-container').style.display = 'block';
+            
+            // Afficher les informations de débogage
+            document.getElementById('debug-info').innerHTML = `
+                <strong>Données envoyées :</strong><br>
+                <pre>${JSON.stringify(requestData, null, 2)}</pre><br>
+                <strong>Données reçues :</strong><br>
+                <pre>${JSON.stringify(data, null, 2)}</pre><br>
+                <strong>Proxy utilisé :</strong> corsproxy.io
+            `;
+            
+            // Ouvrir automatiquement Excel après 1 seconde (optionnel)
+            setTimeout(() => {
+                if (excelUrl) {
+                    window.open(excelUrl, '_blank');
+                    console.log('📂 Fichier Excel ouvert:', excelUrl);
                 }
-            })
-            .catch(error => {
-                console.warn('⚠️ Impossible de tester la connexion OPTIONS:', error.message);
-            });
-        });
-    </script>
+            }, 1000);
+            
+        } else {
+            showError(`Erreur du serveur: ${data.message || 'Réponse inattendue'}`);
+        }
+    })
+    .catch(error => {
+        console.error('❌ Erreur complète:', error);
+        
+        // Réactiver le bouton
+        searchBtn.disabled = false;
+        searchBtn.textContent = 'Lancer la recherche et générer Excel';
+        
+        // Cacher le chargement
+        document.getElementById('loading').style.display = 'none';
+        
+        // Essayer un proxy alternatif si le premier échoue
+        let errorMessage = `Erreur de connexion : ${error.message}`;
+        
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            errorMessage = `
+                ❌ Impossible de se connecter via proxy.<br><br>
+                <strong>Essayez un autre proxy :</strong><br>
+                <button onclick="switchProxy(1)" style="margin: 5px; padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    Proxy 1 (corsproxy.io)
+                </button>
+                <button onclick="switchProxy(2)" style="margin: 5px; padding: 8px 15px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    Proxy 2 (cors-anywhere)
+                </button>
+                <button onclick="switchProxy(3)" style="margin: 5px; padding: 8px 15px; background: #FF9800; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    Proxy 3 (thingproxy)
+                </button>
+            `;
+        }
+        
+        showError(errorMessage);
+        
+        // Afficher les informations de débogage
+        document.getElementById('debug-info').innerHTML = `
+            <strong>Erreur :</strong> ${error.message}<br>
+            <strong>URL avec proxy :</strong> ${N8N_WEBHOOK_URL}<br>
+            <strong>Données envoyées :</strong><br>
+            <pre>${JSON.stringify(requestData, null, 2)}</pre>
+        `;
+        document.getElementById('debug-info').style.display = 'block';
+    });
+}
+
+// Fonction pour changer de proxy
+function switchProxy(proxyNumber) {
+    const proxies = [
+        'https://corsproxy.io/?https://n8n.zackdev.io/webhook/scraping',
+        'https://cors-anywhere.herokuapp.com/https://n8n.zackdev.io/webhook/scraping',
+        'https://thingproxy.freeboard.io/fetch/https://n8n.zackdev.io/webhook/scraping',
+        'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://n8n.zackdev.io/webhook/scraping')
+    ];
+    
+    window.N8N_WEBHOOK_URL = proxies[proxyNumber - 1];
+    console.log(`🔄 Changement vers proxy ${proxyNumber}: ${window.N8N_WEBHOOK_URL}`);
+    alert(`Proxy changé vers l'option ${proxyNumber}. Essayez à nouveau.`);
+    
+    // Cacher le message d'erreur
+    document.getElementById('error-message').style.display = 'none';
+}
+
+function showError(message) {
+    const errorDiv = document.getElementById('error-message');
+    errorDiv.innerHTML = message;
+    errorDiv.style.display = 'block';
+}
+
+function toggleDebug() {
+    const debugDiv = document.getElementById('debug-info');
+    debugDiv.style.display = debugDiv.style.display === 'block' ? 'none' : 'block';
+}
+
+// Permettre d'appuyer sur Entrée pour lancer la recherche
+document.getElementById('keyword').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') startSearch();
+});
+
+document.getElementById('city').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') startSearch();
+});
+
+// Test initial de connexion
+window.addEventListener('load', function() {
+    console.log('🌐 Test de connexion à n8n...');
+    
+    // Tester avec proxy
+    fetch(N8N_WEBHOOK_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({city: 'test', keyword: 'test'})
+    })
+    .then(response => {
+        console.log('Test connexion - Status:', response.status);
+        if (response.status === 200) {
+            console.log('✅ Connexion via proxy OK');
+        }
+    })
+    .catch(error => {
+        console.warn('⚠️ Impossible de tester la connexion:', error.message);
+    });
+});
+   </script>
 </body>
 </html>
