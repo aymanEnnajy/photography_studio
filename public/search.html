@@ -111,88 +111,108 @@
     </div>
 
     <script>
-        // ⚠️ REPLACE THIS WITH YOUR ACTUAL n8n WEBHOOK URL ⚠️
         const N8N_WEBHOOK_URL = 'https://n8n.zackdev.io/webhook/scraping';
+
+async function startSearch() {
+    const keyword = document.getElementById('keyword').value.trim();
+    const city = document.getElementById('city').value.trim();
+    
+    if (!keyword || !city) {
+        alert('Please enter both search term and city');
+        return;
+    }
+    
+    // Show loading, hide results
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('result-box').style.display = 'none';
+    
+    try {
+        // Step 1: First send OPTIONS preflight (browsers do this automatically)
+        // But we can handle it explicitly if needed
         
-        function startSearch() {
-            const keyword = document.getElementById('keyword').value.trim();
-            const city = document.getElementById('city').value.trim();
-            
-            if (!keyword || !city) {
-                alert('Please enter both search term and city');
-                return;
-            }
-            
-            // Show loading, hide results
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('result-box').style.display = 'none';
-            
-            // Prepare data for n8n
-            const requestData = {
+        // Step 2: Send POST request with CORS mode
+        const response = await fetch(N8N_WEBHOOK_URL, {
+            method: 'POST',
+            mode: 'cors', // Explicitly enable CORS
+            credentials: 'omit', // Don't send cookies
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
                 keyword: keyword,
                 city: city
-            };
-            
-            // Call n8n webhook
-            fetch(N8N_WEBHOOK_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestData)
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Hide loading
-                document.getElementById('loading').style.display = 'none';
-                
-                if (data.status === 'success' || data.success) {
-                    // Update download links
-                    document.getElementById('excel-link').href = data.data.download_links.excel || data.downloads.excel;
-                    document.getElementById('csv-link').href = data.data.download_links.csv || data.downloads.csv;
-                    document.getElementById('view-link').href = data.data.view_online || data.view;
-                    
-                    // Show sample data
-                    const sample = data.data.sample_data || {};
-                    document.getElementById('result-info').innerHTML = `
-                        <strong>Sample Result:</strong> ${sample.business || 'N/A'}<br>
-                        <strong>Address:</strong> ${sample.address || 'N/A'}<br>
-                        <strong>Rating:</strong> ${sample.rating || 'N/A'}<br>
-                        <strong>Generated:</strong> ${new Date(data.timestamp).toLocaleString()}
-                    `;
-                    
-                    // Show results
-                    document.getElementById('result-box').style.display = 'block';
-                    
-                    // Optional: Auto-open Excel in new tab after 1 second
-                    setTimeout(() => {
-                        window.open(data.data.download_links.excel, '_blank');
-                    }, 1000);
-                    
-                } else {
-                    alert('Error: ' + (data.message || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                document.getElementById('loading').style.display = 'none';
-                alert('Error: ' + error.message);
-                console.error('Error:', error);
-            });
+        });
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
         
-        // Allow pressing Enter to search
-        document.getElementById('keyword').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') startSearch();
-        });
+        const data = await response.json();
+        console.log('Response data:', data);
         
-        document.getElementById('city').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') startSearch();
-        });
+        // Hide loading
+        document.getElementById('loading').style.display = 'none';
+        
+        if (data.status === 'success' || data.success) {
+            // Update download links
+            const excelUrl = data.data?.download_links?.excel || data.downloads?.excel;
+            const csvUrl = data.data?.download_links?.csv || data.downloads?.csv;
+            const viewUrl = data.data?.view_online || data.view;
+            
+            document.getElementById('excel-link').href = excelUrl;
+            document.getElementById('csv-link').href = csvUrl;
+            document.getElementById('view-link').href = viewUrl;
+            
+            // Show sample data
+            const sample = data.data?.sample_data || {};
+            document.getElementById('result-info').innerHTML = `
+                <strong>Sample Result:</strong> ${sample.business || 'N/A'}<br>
+                <strong>Address:</strong> ${sample.address || 'N/A'}<br>
+                <strong>Rating:</strong> ${sample.rating || 'N/A'}<br>
+                <strong>Generated:</strong> ${new Date(data.timestamp).toLocaleString()}
+            `;
+            
+            // Show results
+            document.getElementById('result-box').style.display = 'block';
+            
+            // Auto-open Excel in new tab
+            if (excelUrl) {
+                setTimeout(() => {
+                    window.open(excelUrl, '_blank');
+                }, 1000);
+            }
+            
+        } else {
+            alert('Error from server: ' + (data.message || 'Unknown error'));
+        }
+        
+    } catch (error) {
+        document.getElementById('loading').style.display = 'none';
+        console.error('Full error:', error);
+        
+        // More helpful error message
+        if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+            alert(`CORS Error: Cannot connect to n8n.\n\nPossible solutions:\n1. Check if n8n is running\n2. Add CORS headers in n8n\n3. Use a proxy server`);
+        } else {
+            alert('Error: ' + error.message);
+        }
+    }
+}
+
+// Enter key support
+document.getElementById('keyword').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') startSearch();
+});
+
+document.getElementById('city').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') startSearch();
+});
     </script>
 </body>
 </html>
