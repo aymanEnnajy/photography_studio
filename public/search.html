@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recherche Google Maps</title>
+    <title>Recherche Google Maps - Téléchargement Excel</title>
     <style>
         * {
             margin: 0;
@@ -120,7 +120,7 @@
             background: #f8f9fa;
             padding: 25px;
             border-radius: 15px;
-            text-align: left;
+            text-align: center;
         }
         
         .download-buttons {
@@ -132,7 +132,7 @@
         }
         
         .download-btn {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 10px;
             background: white;
@@ -143,7 +143,8 @@
             color: #333;
             font-weight: 600;
             transition: all 0.3s;
-            min-width: 200px;
+            min-width: 180px;
+            justify-content: center;
         }
         
         .download-btn:hover {
@@ -161,20 +162,13 @@
             color: #1d6f8a;
         }
         
+        .download-btn.view {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
         .icon {
             font-size: 24px;
-        }
-        
-        .view-link {
-            display: inline-block;
-            margin-top: 15px;
-            color: #667eea;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        
-        .view-link:hover {
-            text-decoration: underline;
         }
         
         .error-message {
@@ -184,6 +178,7 @@
             border-radius: 10px;
             margin: 20px 0;
             display: none;
+            text-align: left;
         }
         
         .success-message {
@@ -194,23 +189,105 @@
             margin: 20px 0;
         }
         
-        .debug-info {
-            background: #f5f5f5;
-            padding: 15px;
+        .result-info {
+            background: white;
+            padding: 20px;
             border-radius: 10px;
-            margin-top: 20px;
-            font-family: monospace;
-            font-size: 12px;
-            overflow: auto;
-            max-height: 200px;
+            margin: 20px 0;
+            text-align: left;
+            border-left: 4px solid #667eea;
+        }
+        
+        /* Modal Popup */
+        .modal {
             display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalAppear 0.3s ease;
+        }
+        
+        @keyframes modalAppear {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .modal-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 25px;
+            border: 2px solid;
+            border-radius: 10px;
+            background: white;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            min-width: 180px;
+            justify-content: center;
+        }
+        
+        .modal-btn.excel {
+            border-color: #217346;
+            color: #217346;
+        }
+        
+        .modal-btn.csv {
+            border-color: #1d6f8a;
+            color: #1d6f8a;
+        }
+        
+        .modal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .close-btn {
+            margin-top: 20px;
+            padding: 10px 25px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .close-btn:hover {
+            background: #e0e0e0;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🔍 Recherche Google Maps</h1>
-        <p class="subtitle">Trouvez des entreprises et téléchargez les résultats en Excel/CSV</p>
+        <p class="subtitle">Trouvez des entreprises et téléchargez les résultats</p>
         
         <div class="form-group">
             <label for="keyword">Terme de recherche :</label>
@@ -237,288 +314,246 @@
                 ✅ Recherche terminée avec succès !
             </div>
             
-            <div id="result-info" style="margin: 20px 0;">
+            <div id="result-info" class="result-info">
                 <!-- Les informations des résultats apparaîtront ici -->
             </div>
             
             <div class="download-buttons">
                 <a href="#" id="excel-link" class="download-btn excel" target="_blank">
                     <span class="icon">📊</span>
-                    <span>
-                        <strong>Télécharger Excel</strong><br>
-                        <small>Format .xlsx</small>
-                    </span>
+                    <span>Télécharger Excel</span>
                 </a>
                 
                 <a href="#" id="csv-link" class="download-btn csv" target="_blank">
                     <span class="icon">📈</span>
-                    <span>
-                        <strong>Télécharger CSV</strong><br>
-                        <small>Format .csv</small>
-                    </span>
+                    <span>Télécharger CSV</span>
                 </a>
-            </div>
-            
-            <div style="text-align: center;">
-                <a href="#" id="view-link" class="view-link" target="_blank">
-                    👁️ Voir les résultats en ligne dans Google Sheets
+                
+                <a href="#" id="view-link" class="download-btn view" target="_blank">
+                    <span class="icon">👁️</span>
+                    <span>Voir en ligne</span>
                 </a>
-            </div>
-            
-            <button onclick="toggleDebug()" style="margin-top: 20px; background: #f0f0f0; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 12px;">
-                📋 Afficher les détails techniques
-            </button>
-            
-            <div class="debug-info" id="debug-info">
-                <!-- Informations de débogage -->
             </div>
         </div>
     </div>
 
-   <script>
-  // ⚠️ UTILISEZ VOTRE WORKER CLOUDFLARE ⚠️
-const PROXY_URL = 'https://n8n-proxy.ayman93011.workers.dev/';
+    <!-- Modal Popup -->
+    <div id="downloadModal" class="modal">
+        <div class="modal-content">
+            <h2>📥 Téléchargement prêt !</h2>
+            <p>Sélectionnez le format de téléchargement :</p>
+            
+            <div class="modal-buttons">
+                <a href="#" id="modal-excel" class="modal-btn excel" target="_blank">
+                    <span class="icon">📊</span>
+                    <span>Excel (.xlsx)</span>
+                </a>
+                
+                <a href="#" id="modal-csv" class="modal-btn csv" target="_blank">
+                    <span class="icon">📈</span>
+                    <span>CSV (.csv)</span>
+                </a>
+            </div>
+            
+            <p style="margin: 20px 0; font-size: 14px; color: #666;">
+                Les fichiers se téléchargeront automatiquement dans un nouvel onglet
+            </p>
+            
+            <button class="close-btn" onclick="closeModal()">Fermer cette fenêtre</button>
+        </div>
+    </div>
 
-function startSearch() {
-    const keyword = document.getElementById('keyword').value.trim();
-    const city = document.getElementById('city').value.trim();
-    
-    if (!keyword || !city) {
-        alert('Veuillez entrer un terme de recherche et une ville');
-        return;
-    }
-    
-    // Afficher le chargement, cacher les résultats et erreurs
-    document.getElementById('loading').style.display = 'block';
-    document.getElementById('result-container').style.display = 'none';
-    document.getElementById('error-message').style.display = 'none';
-    document.getElementById('debug-info').style.display = 'none';
-    
-    // Désactiver le bouton pendant la requête
-    const searchBtn = document.querySelector('.search-btn');
-    searchBtn.disabled = true;
-    searchBtn.textContent = 'Recherche en cours...';
-    
-    // Préparer les données EXACTEMENT comme dans Postman
-    const requestData = {
-        city: city,
-        keyword: keyword
-    };
-    
-    // Afficher les données envoyées dans la console
-    console.log('📤 Données envoyées à n8n:', requestData);
-    console.log('🌐 URL de votre Worker Cloudflare:', PROXY_URL);
-    
-    // Envoyer la requête via VOTRE Worker Cloudflare
-    fetch(PROXY_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-            // 'X-Requested-With' n'est plus nécessaire avec votre propre Worker
-        },
-        body: JSON.stringify(requestData)
-    })
-    .then(response => {
-        console.log('📥 Réponse reçue - Status:', response.status);
-        console.log('📥 Headers de la réponse:', response.headers);
+    <script>
+        // ⚠️ CONFIGUREZ ICI : Votre Worker Cloudflare
+        const WORKER_URL = 'https://n8n-proxy.ayman93011.workers.dev/';
         
-        // Réactiver le bouton
-        searchBtn.disabled = false;
-        searchBtn.textContent = 'Lancer la recherche et générer Excel';
+        // Variables globales pour les URLs
+        let currentExcelUrl = '';
+        let currentCsvUrl = '';
+        let currentViewUrl = '';
         
-        if (!response.ok) {
-            return response.text().then(text => {
-                console.error('❌ Réponse erreur:', text);
-                throw new Error(`HTTP ${response.status}: ${text.substring(0, 100)}...`);
+        function startSearch() {
+            const keyword = document.getElementById('keyword').value.trim();
+            const city = document.getElementById('city').value.trim();
+            
+            if (!keyword || !city) {
+                alert('Veuillez entrer un terme de recherche et une ville');
+                return;
+            }
+            
+            // Afficher le chargement, cacher les résultats et erreurs
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result-container').style.display = 'none';
+            document.getElementById('error-message').style.display = 'none';
+            closeModal(); // Fermer le modal si ouvert
+            
+            // Désactiver le bouton pendant la requête
+            const searchBtn = document.querySelector('.search-btn');
+            searchBtn.disabled = true;
+            searchBtn.textContent = 'Recherche en cours...';
+            
+            // Préparer les données
+            const requestData = {
+                city: city,
+                keyword: keyword
+            };
+            
+            console.log('📤 Envoi des données:', requestData);
+            console.log('🌐 Worker URL:', WORKER_URL);
+            
+            // Envoyer la requête via votre Worker Cloudflare
+            fetch(WORKER_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => {
+                console.log('📥 Status:', response.status);
+                console.log('📥 Headers:', response.headers);
+                
+                // Réactiver le bouton
+                searchBtn.disabled = false;
+                searchBtn.textContent = 'Lancer la recherche et générer Excel';
+                
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        console.error('❌ Réponse erreur:', text);
+                        let errorMsg = `HTTP ${response.status}`;
+                        try {
+                            const errorData = JSON.parse(text);
+                            errorMsg = errorData.message || errorMsg;
+                        } catch(e) {}
+                        throw new Error(errorMsg);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('✅ Données reçues:', data);
+                
+                // Cacher le chargement
+                document.getElementById('loading').style.display = 'none';
+                
+                // Vérifier si la réponse est un succès
+                if (data.status === 'success' || data.success === true) {
+                    // Sauvegarder les URLs
+                    currentExcelUrl = data.data?.download_links?.excel || data.downloads?.excel || '';
+                    currentCsvUrl = data.data?.download_links?.csv || data.downloads?.csv || '';
+                    currentViewUrl = data.data?.view_online || data.view || '';
+                    
+                    // Mettre à jour les liens permanents
+                    if (currentExcelUrl) {
+                        document.getElementById('excel-link').href = currentExcelUrl;
+                        document.getElementById('modal-excel').href = currentExcelUrl;
+                    }
+                    if (currentCsvUrl) {
+                        document.getElementById('csv-link').href = currentCsvUrl;
+                        document.getElementById('modal-csv').href = currentCsvUrl;
+                    }
+                    if (currentViewUrl) {
+                        document.getElementById('view-link').href = currentViewUrl;
+                    }
+                    
+                    // Afficher les informations des résultats
+                    const sample = data.data?.sample_data || {};
+                    document.getElementById('result-info').innerHTML = `
+                        <strong style="color: #333; display: block; margin-bottom: 10px;">📋 Exemple de résultat :</strong>
+                        <p><strong>🏢 Entreprise :</strong> ${sample.business || 'Non disponible'}</p>
+                        <p><strong>📍 Adresse :</strong> ${sample.address || 'Non disponible'}</p>
+                        <p><strong>⭐ Note :</strong> ${sample.rating || 'N/A'}/5</p>
+                        <p><strong>🕒 Généré le :</strong> ${new Date(data.timestamp).toLocaleString('fr-FR')}</p>
+                    `;
+                    
+                    // Afficher le conteneur des résultats
+                    document.getElementById('result-container').style.display = 'block';
+                    
+                    // Ouvrir le modal popup
+                    if (currentExcelUrl || currentCsvUrl) {
+                        setTimeout(() => {
+                            openModal();
+                        }, 500);
+                    }
+                    
+                } else {
+                    showError(`Erreur du serveur: ${data.message || 'Réponse inattendue'}`);
+                }
+            })
+            .catch(error => {
+                console.error('❌ Erreur:', error);
+                
+                // Réactiver le bouton
+                searchBtn.disabled = false;
+                searchBtn.textContent = 'Lancer la recherche et générer Excel';
+                
+                // Cacher le chargement
+                document.getElementById('loading').style.display = 'none';
+                
+                // Message d'erreur personnalisé
+                let errorMessage = `Erreur: ${error.message}`;
+                
+                if (error.message.includes('404') || error.message.includes('not registered')) {
+                    errorMessage = `
+                        ❌ Erreur 404 - Webhook n8n non trouvé<br><br>
+                        <strong>Vérifiez dans n8n :</strong><br>
+                        1. Votre workflow est-il ACTIVÉ ? (toggle ON en haut à droite)<br>
+                        2. L'URL du webhook est-elle correcte ?<br>
+                        3. Testez avec Postman: https://n8n.zackdev.io/webhook/scraping
+                    `;
+                } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    errorMessage = `
+                        ❌ Impossible de se connecter<br><br>
+                        <strong>Vérifiez :</strong><br>
+                        1. Votre Worker Cloudflare est déployé<br>
+                        2. L'URL est correcte: ${WORKER_URL}<br>
+                        3. Les logs du Worker dans Cloudflare
+                    `;
+                }
+                
+                showError(errorMessage);
             });
         }
-        return response.json();
-    })
-    .then(data => {
-        console.log('✅ Données reçues via votre Worker:', data);
         
-        // Cacher le chargement
-        document.getElementById('loading').style.display = 'none';
-        
-        // Vérifier si la réponse est un succès
-        if (data.status === 'success' || data.success === true) {
-            // Mettre à jour les liens de téléchargement
-            const excelUrl = data.data?.download_links?.excel || data.downloads?.excel;
-            const csvUrl = data.data?.download_links?.csv || data.downloads?.csv;
-            const viewUrl = data.data?.view_online || data.view;
-            
-            document.getElementById('excel-link').href = excelUrl;
-            document.getElementById('csv-link').href = csvUrl;
-            document.getElementById('view-link').href = viewUrl;
-            
-            // Afficher les informations des résultats
-            const sample = data.data?.sample_data || {};
-            document.getElementById('result-info').innerHTML = `
-                <div style="background: white; padding: 15px; border-radius: 10px; border-left: 4px solid #667eea;">
-                    <strong style="color: #333;">Exemple de résultat :</strong><br>
-                    <strong>🏢 Entreprise :</strong> ${sample.business || 'Non disponible'}<br>
-                    <strong>📍 Adresse :</strong> ${sample.address || 'Non disponible'}<br>
-                    <strong>⭐ Note :</strong> ${sample.rating || 'N/A'}/5<br>
-                    <strong>🕒 Généré le :</strong> ${new Date(data.timestamp).toLocaleString('fr-FR')}
-                </div>
-            `;
-            
-            // Afficher le conteneur des résultats
-            document.getElementById('result-container').style.display = 'block';
-            
-            // Afficher les informations de débogage
-            document.getElementById('debug-info').innerHTML = `
-                <strong>Données envoyées :</strong><br>
-                <pre>${JSON.stringify(requestData, null, 2)}</pre><br>
-                <strong>Données reçues :</strong><br>
-                <pre>${JSON.stringify(data, null, 2)}</pre><br>
-                <strong>Proxy utilisé :</strong> Votre Worker Cloudflare (${PROXY_URL})
-            `;
-            
-            // Ouvrir automatiquement Excel après 1 seconde (optionnel)
-            setTimeout(() => {
-                if (excelUrl) {
-                    window.open(excelUrl, '_blank');
-                    console.log('📂 Fichier Excel ouvert:', excelUrl);
-                }
-            }, 1000);
-            
-        } else {
-            showError(`Erreur du serveur: ${data.message || 'Réponse inattendue'}`);
-        }
-    })
-    .catch(error => {
-        console.error('❌ Erreur complète:', error);
-        
-        // Réactiver le bouton
-        searchBtn.disabled = false;
-        searchBtn.textContent = 'Lancer la recherche et générer Excel';
-        
-        // Cacher le chargement
-        document.getElementById('loading').style.display = 'none';
-        
-        // Messages d'erreur spécifiques
-        let errorMessage = `Erreur de connexion : ${error.message}`;
-        
-        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-            errorMessage = `
-                ❌ Impossible de se connecter à votre Worker Cloudflare.<br><br>
-                <strong>Vérifiez :</strong><br>
-                1. Votre Worker est bien déployé : ${PROXY_URL}<br>
-                2. Le code du Worker est correct<br>
-                3. Les logs du Worker dans Cloudflare Dashboard
-            `;
-        } else if (error.message.includes('500') || error.message.includes('Proxy error')) {
-            errorMessage = `
-                ❌ Votre Worker Cloudflare a une erreur interne.<br><br>
-                <strong>Vérifiez les logs :</strong><br>
-                1. Allez dans Cloudflare Dashboard<br>
-                2. Workers & Pages → n8n-proxy<br>
-                3. Cliquez sur "Logs"<br>
-                4. Voir les erreurs en temps réel
-            `;
+        // Fonctions pour le modal
+        function openModal() {
+            if (currentExcelUrl || currentCsvUrl) {
+                document.getElementById('downloadModal').style.display = 'flex';
+            }
         }
         
-        showError(errorMessage);
-        
-        // Afficher les informations de débogage
-        document.getElementById('debug-info').innerHTML = `
-            <strong>Erreur :</strong> ${error.message}<br>
-            <strong>URL Worker :</strong> ${PROXY_URL}<br>
-            <strong>Données envoyées :</strong><br>
-            <pre>${JSON.stringify(requestData, null, 2)}</pre><br>
-            <strong>Test direct :</strong> <button onclick="testWorkerDirectly()" style="margin: 5px; padding: 5px 10px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">
-                Tester le Worker directement
-            </button>
-        `;
-        document.getElementById('debug-info').style.display = 'block';
-    });
-}
-
-// Fonction pour tester le Worker directement
-function testWorkerDirectly() {
-    console.log('🧪 Test direct du Worker...');
-    
-    fetch(PROXY_URL, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({city: 'Test', keyword: 'Test'})
-    })
-    .then(response => {
-        console.log('Test Worker - Status:', response.status);
-        console.log('Test Worker - Headers:', response.headers);
-        return response.text();
-    })
-    .then(text => {
-        console.log('Test Worker - Response:', text);
-        alert(`Test Worker:\nStatus: ${response?.status}\nResponse: ${text.substring(0, 200)}...`);
-    })
-    .catch(error => {
-        console.error('Test Worker - Error:', error);
-        alert('Test Worker échoué: ' + error.message);
-    });
-}
-
-// Fonction pour changer de proxy (gardée pour compatibilité)
-function switchProxy(proxyNumber) {
-    const proxies = [
-        PROXY_URL, // Votre Worker
-        'https://corsproxy.io/?https://n8n.zackdev.io/webhook/scraping',
-        'https://cors-anywhere.herokuapp.com/https://n8n.zackdev.io/webhook/scraping'
-    ];
-    
-    window.PROXY_URL = proxies[proxyNumber - 1];
-    console.log(`🔄 Changement vers proxy ${proxyNumber}: ${window.PROXY_URL}`);
-    alert(`Proxy changé. Essayez à nouveau.`);
-    
-    // Cacher le message d'erreur
-    document.getElementById('error-message').style.display = 'none';
-}
-
-function showError(message) {
-    const errorDiv = document.getElementById('error-message');
-    errorDiv.innerHTML = message;
-    errorDiv.style.display = 'block';
-}
-
-function toggleDebug() {
-    const debugDiv = document.getElementById('debug-info');
-    debugDiv.style.display = debugDiv.style.display === 'block' ? 'none' : 'block';
-}
-
-// Permettre d'appuyer sur Entrée pour lancer la recherche
-document.getElementById('keyword').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') startSearch();
-});
-
-document.getElementById('city').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') startSearch();
-});
-
-// Test initial de connexion
-window.addEventListener('load', function() {
-    console.log('🌐 Test de connexion à votre Worker...');
-    
-    // Tester le Worker avec une requête simple
-    fetch(PROXY_URL, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({city: 'test', keyword: 'test'})
-    })
-    .then(response => {
-        console.log('Test Worker - Status:', response.status);
-        if (response.status === 200) {
-            console.log('✅ Connexion Worker OK');
-        } else {
-            console.warn('⚠️ Worker répond mais avec status:', response.status);
+        function closeModal() {
+            document.getElementById('downloadModal').style.display = 'none';
         }
-    })
-    .catch(error => {
-        console.warn('⚠️ Impossible de tester le Worker:', error.message);
-        console.warn('Vérifiez que votre Worker est bien déployé et actif.');
-    });
-});
-   </script>
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.innerHTML = message;
+            errorDiv.style.display = 'block';
+        }
+        
+        // Permettre d'appuyer sur Entrée pour lancer la recherche
+        document.getElementById('keyword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') startSearch();
+        });
+        
+        document.getElementById('city').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') startSearch();
+        });
+        
+        // Fermer le modal en cliquant à l'extérieur
+        document.getElementById('downloadModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        
+        // Test initial de connexion
+        window.addEventListener('load', function() {
+            console.log('🌐 Initialisation...');
+            console.log('📱 Worker configuré:', WORKER_URL);
+        });
+    </script>
 </body>
 </html>
