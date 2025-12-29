@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Maps Search & Download</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .search-box {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 12px;
+            margin: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .result-box {
+            display: none;
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .download-btn {
+            display: inline-block;
+            background: #2196F3;
+            color: white;
+            padding: 12px 24px;
+            margin: 10px 5px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .download-btn.excel {
+            background: #217346;
+        }
+        .download-btn.csv {
+            background: #1d6f8a;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Google Maps Search</h1>
+    
+    <div class="search-box">
+        <h3>Search Businesses</h3>
+        <input type="text" id="keyword" placeholder="Enter search term (e.g., studio photo)" value="studio photo">
+        <input type="text" id="city" placeholder="Enter city (e.g., Casablanca)" value="Casablanca">
+        <button onclick="startSearch()">Search & Generate Excel File</button>
+    </div>
+    
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Searching Google Maps and creating Excel file...</p>
+    </div>
+    
+    <div class="result-box" id="result-box">
+        <h3>✅ Search Completed!</h3>
+        <p>Download your results:</p>
+        
+        <div class="download-buttons">
+            <a href="#" id="excel-link" class="download-btn excel" target="_blank">
+                📊 Download Excel (.xlsx)
+            </a>
+            <a href="#" id="csv-link" class="download-btn csv" target="_blank">
+                📈 Download CSV (.csv)
+            </a>
+        </div>
+        
+        <p style="margin-top: 20px;">
+            <a href="#" id="view-link" target="_blank">👁️ View Online in Google Sheets</a>
+        </p>
+        
+        <div id="result-info" style="margin-top: 15px; font-size: 14px; color: #555;">
+            <!-- Results info will appear here -->
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ REPLACE THIS WITH YOUR ACTUAL n8n WEBHOOK URL ⚠️
+        const N8N_WEBHOOK_URL = 'https://n8n.zackdev.io/webhook/scraping';
+        
+        function startSearch() {
+            const keyword = document.getElementById('keyword').value.trim();
+            const city = document.getElementById('city').value.trim();
+            
+            if (!keyword || !city) {
+                alert('Please enter both search term and city');
+                return;
+            }
+            
+            // Show loading, hide results
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result-box').style.display = 'none';
+            
+            // Prepare data for n8n
+            const requestData = {
+                keyword: keyword,
+                city: city
+            };
+            
+            // Call n8n webhook
+            fetch(N8N_WEBHOOK_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+                
+                if (data.status === 'success' || data.success) {
+                    // Update download links
+                    document.getElementById('excel-link').href = data.data.download_links.excel || data.downloads.excel;
+                    document.getElementById('csv-link').href = data.data.download_links.csv || data.downloads.csv;
+                    document.getElementById('view-link').href = data.data.view_online || data.view;
+                    
+                    // Show sample data
+                    const sample = data.data.sample_data || {};
+                    document.getElementById('result-info').innerHTML = `
+                        <strong>Sample Result:</strong> ${sample.business || 'N/A'}<br>
+                        <strong>Address:</strong> ${sample.address || 'N/A'}<br>
+                        <strong>Rating:</strong> ${sample.rating || 'N/A'}<br>
+                        <strong>Generated:</strong> ${new Date(data.timestamp).toLocaleString()}
+                    `;
+                    
+                    // Show results
+                    document.getElementById('result-box').style.display = 'block';
+                    
+                    // Optional: Auto-open Excel in new tab after 1 second
+                    setTimeout(() => {
+                        window.open(data.data.download_links.excel, '_blank');
+                    }, 1000);
+                    
+                } else {
+                    alert('Error: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                document.getElementById('loading').style.display = 'none';
+                alert('Error: ' + error.message);
+                console.error('Error:', error);
+            });
+        }
+        
+        // Allow pressing Enter to search
+        document.getElementById('keyword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') startSearch();
+        });
+        
+        document.getElementById('city').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') startSearch();
+        });
+    </script>
+</body>
+</html>
