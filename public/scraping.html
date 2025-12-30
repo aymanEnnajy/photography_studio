@@ -389,7 +389,7 @@
         </div>
     </div>
 
-    <script>
+        <script>
         // ⚠️ CONFIGUREZ ICI : Votre Worker Cloudflare
         const WORKER_URL = 'https://n8n-proxy.ayman93011.workers.dev/';
 
@@ -418,14 +418,25 @@
             searchBtn.disabled = true;
             searchBtn.textContent = 'Recherche en cours...';
 
-            // Préparer les données
+            // ⭐⭐⭐ CORRECTION : Construire l'URL Google Maps pour le scraping ⭐⭐⭐
+            const query = encodeURIComponent(`${keyword} ${city}`);
+            const targetURL = `https://www.google.com/maps/search/${query}/`;
+
+            // Préparer les données AVEC URL (obligatoire pour le proxy)
             const requestData = {
+                website: targetURL,      // Accepté par le proxy (website, url, link, target)
+                url: targetURL,          // Doublé pour être sûr
                 city: city,
-                keyword: keyword
+                keyword: keyword,
+                action: 'scrape_businesses',
+                source: 'google_maps',
+                timestamp: new Date().toISOString(),
+                user_agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             };
 
             console.log('📤 Envoi des données:', requestData);
             console.log('🌐 Worker URL:', WORKER_URL);
+            console.log('📍 URL de scraping:', targetURL);
 
             // Envoyer la requête via votre Worker Cloudflare
             fetch(WORKER_URL, {
@@ -464,47 +475,94 @@
                     document.getElementById('loading').style.display = 'none';
 
                     // Vérifier si la réponse est un succès
-                    if (data.status === 'success' || data.success === true) {
+                    if (data.status === 'success' || data.success === true || data.status === 'completed') {
                         // Sauvegarder les URLs
-                        currentExcelUrl = data.data?.download_links?.excel || data.downloads?.excel || '';
-                        currentCsvUrl = data.data?.download_links?.csv || data.downloads?.csv || '';
-                        currentViewUrl = data.data?.view_online || data.view || '';
+                        currentExcelUrl = data.data?.download_links?.excel || 
+                                         data.downloads?.excel || 
+                                         data.excel_url || 
+                                         data.file_urls?.excel || '';
+
+                        currentCsvUrl = data.data?.download_links?.csv || 
+                                       data.downloads?.csv || 
+                                       data.csv_url || 
+                                       data.file_urls?.csv || '';
+
+                        currentViewUrl = data.data?.view_online || 
+                                        data.view || 
+                                        data.preview_url || '';
 
                         // Mettre à jour les liens permanents
                         if (currentExcelUrl) {
                             document.getElementById('excel-link').href = currentExcelUrl;
                             document.getElementById('modal-excel').href = currentExcelUrl;
+                            document.getElementById('excel-link').style.display = 'inline-block';
+                        } else {
+                            document.getElementById('excel-link').style.display = 'none';
                         }
+
                         if (currentCsvUrl) {
                             document.getElementById('csv-link').href = currentCsvUrl;
                             document.getElementById('modal-csv').href = currentCsvUrl;
+                            document.getElementById('csv-link').style.display = 'inline-block';
+                        } else {
+                            document.getElementById('csv-link').style.display = 'none';
                         }
+
                         if (currentViewUrl) {
                             document.getElementById('view-link').href = currentViewUrl;
+                            document.getElementById('view-link').style.display = 'inline-block';
+                        } else {
+                            document.getElementById('view-link').style.display = 'none';
                         }
 
                         // Afficher les informations des résultats
-                        const sample = data.data?.sample_data || {};
+                        const sample = data.data?.sample_data || data.sample || data.results?.[0] || {};
+                        const resultCount = data.data?.count || data.total_results || data.count || 'Plusieurs';
+                        
                         document.getElementById('result-info').innerHTML = `
-                        <strong style="color: #333; display: block; margin-bottom: 10px;">📋 Exemple de résultat :</strong>
-                        <p><strong>🏢 Entreprise :</strong> ${sample.business || 'Non disponible'}</p>
-                        <p><strong>📍 Adresse :</strong> ${sample.address || 'Non disponible'}</p>
-                        <p><strong>⭐ Note :</strong> ${sample.rating || 'N/A'}/5</p>
-                        <p><strong>🕒 Généré le :</strong> ${new Date(data.timestamp).toLocaleString('fr-FR')}</p>
-                    `;
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #4CAF50;">
+                                <strong style="color: #333; display: block; margin-bottom: 10px; font-size: 16px;">
+                                    📋 Résultats trouvés : ${resultCount}
+                                </strong>
+                                <p><strong>🏢 Entreprise :</strong> ${sample.business || sample.name || sample.company || 'Non disponible'}</p>
+                                <p><strong>📍 Adresse :</strong> ${sample.address || sample.location || sample.full_address || 'Non disponible'}</p>
+                                <p><strong>📞 Téléphone :</strong> ${sample.phone || sample.telephone || sample.contact || 'Non disponible'}</p>
+                                <p><strong>⭐ Note :</strong> ${sample.rating || sample.review_rating || 'N/A'}/5</p>
+                                <p><strong>🌐 Site web :</strong> ${sample.website || sample.url || 'Non disponible'}</p>
+                                <p><strong>🕒 Généré le :</strong> ${new Date(data.timestamp || Date.now()).toLocaleString('fr-FR')}</p>
+                            </div>
+                        `;
 
                         // Afficher le conteneur des résultats
                         document.getElementById('result-container').style.display = 'block';
 
-                        // Ouvrir le modal popup
+                        // Ouvrir le modal popup si on a des fichiers
                         if (currentExcelUrl || currentCsvUrl) {
                             setTimeout(() => {
                                 openModal();
-                            }, 500);
+                            }, 800); // Petit délai pour l'effet
+                        }
+
+                        // Si pas de fichiers mais succès, afficher message
+                        if (!currentExcelUrl && !currentCsvUrl) {
+                            document.getElementById('result-info').innerHTML += `
+                                <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border-radius: 5px; border: 1px solid #ffeaa7;">
+                                    <strong>ℹ️ Note :</strong> Les données ont été traitées avec succès mais aucun lien de téléchargement n'a été généré.<br>
+                                    Vérifiez la configuration de n8n pour générer des fichiers Excel/CSV.
+                                </div>
+                            `;
                         }
 
                     } else {
-                        showError(`Erreur du serveur: ${data.message || 'Réponse inattendue'}`);
+                        // Gestion des réponses d'erreur de n8n
+                        let errorMsg = data.message || 'Erreur du serveur';
+                        if (data.instructions) {
+                            errorMsg += '<br><br>' + data.instructions.join('<br>');
+                        }
+                        if (data.hint) {
+                            errorMsg += '<br><br>' + data.hint;
+                        }
+                        showError(`Erreur: ${errorMsg}`);
                     }
                 })
                 .catch(error => {
@@ -520,22 +578,41 @@
                     // Message d'erreur personnalisé
                     let errorMessage = `Erreur: ${error.message}`;
 
-                    if (error.message.includes('404') || error.message.includes('not registered')) {
+                    if (error.message.includes('400') || error.message.includes('Aucune URL')) {
                         errorMessage = `
-                        ❌ Erreur 404 - Webhook n8n non trouvé<br><br>
-                        <strong>Vérifiez dans n8n :</strong><br>
-                        1. Votre workflow est-il ACTIVÉ ? (toggle ON en haut à droite)<br>
-                        2. L'URL du webhook est-elle correcte ?<br>
-                        3. Testez avec Postman: https://n8n.zackdev.io/webhook/scraping
-                    `;
+                            ❌ Erreur 400 - Données invalides<br><br>
+                            <strong>Le proxy attend une URL à scraper.</strong><br>
+                            Vérifiez que votre code envoie bien une clé "url" ou "website".<br>
+                            <small>Dernière requête envoyée: ${JSON.stringify(requestData)}</small>
+                        `;
+                    } else if (error.message.includes('404') || error.message.includes('not registered')) {
+                        errorMessage = `
+                            ❌ Erreur 404 - Webhook n8n non trouvé<br><br>
+                            <strong>Vérifiez dans n8n :</strong><br>
+                            1. Votre workflow est-il ACTIVÉ ? (toggle ON en haut à droite)<br>
+                            2. L'URL du webhook est-elle correcte ?<br>
+                            3. Testez avec curl:<br>
+                            <code>curl -X POST https://n8n.zackdev.io/webhook/scraping -H "Content-Type: application/json" -d '{"url":"https://google.com"}'</code>
+                        `;
                     } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
                         errorMessage = `
-                        ❌ Impossible de se connecter<br><br>
-                        <strong>Vérifiez :</strong><br>
-                        1. Votre Worker Cloudflare est déployé<br>
-                        2. L'URL est correcte: ${WORKER_URL}<br>
-                        3. Les logs du Worker dans Cloudflare
-                    `;
+                            ❌ Impossible de se connecter au proxy<br><br>
+                            <strong>Vérifiez :</strong><br>
+                            1. Votre Worker Cloudflare est déployé<br>
+                            2. L'URL est correcte: ${WORKER_URL}<br>
+                            3. Testez le proxy: <a href="${WORKER_URL}" target="_blank">${WORKER_URL}</a> (devrait afficher un message)<br>
+                            4. Les logs du Worker dans Cloudflare
+                        `;
+                    } else if (error.message.includes('502') || error.message.includes('504')) {
+                        errorMessage = `
+                            ❌ Proxy ne peut pas joindre n8n<br><br>
+                            <strong>Problèmes possibles :</strong><br>
+                            1. n8n est hors ligne<br>
+                            2. L'URL n8n est incorrecte<br>
+                            3. Timeout (n8n trop lent à répondre)<br><br>
+                            <strong>Test direct n8n :</strong><br>
+                            <a href="https://n8n.zackdev.io/webhook/scraping" target="_blank">https://n8n.zackdev.io/webhook/scraping</a>
+                        `;
                     }
 
                     showError(errorMessage);
@@ -546,6 +623,8 @@
         function openModal() {
             if (currentExcelUrl || currentCsvUrl) {
                 document.getElementById('downloadModal').style.display = 'flex';
+                // Animation d'entrée
+                document.querySelector('.modal-content').style.animation = 'slideIn 0.3s ease-out';
             }
         }
 
@@ -555,8 +634,13 @@
 
         function showError(message) {
             const errorDiv = document.getElementById('error-message');
-            errorDiv.innerHTML = message;
+            errorDiv.innerHTML = `<div style="padding: 15px; background: #f8d7da; border-radius: 5px; border: 1px solid #f5c6cb;">
+                ${message}
+            </div>`;
             errorDiv.style.display = 'block';
+            
+            // Scroll vers l'erreur
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         // Permettre d'appuyer sur Entrée pour lancer la recherche
@@ -575,11 +659,61 @@
             }
         });
 
+        // Fermer le modal avec Escape
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
         // Test initial de connexion
         window.addEventListener('load', function () {
-            console.log('🌐 Initialisation...');
+            console.log('🌐 Initialisation scraping...');
             console.log('📱 Worker configuré:', WORKER_URL);
+            
+            // Test rapide du proxy
+            fetch(WORKER_URL, { method: 'GET' })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('✅ Proxy test réussi:', data.message);
+                    document.getElementById('status-indicator').innerHTML = 
+                        '<span style="color: #4CAF50;">●</span> Proxy connecté';
+                })
+                .catch(error => {
+                    console.warn('⚠️ Proxy non accessible:', error);
+                    document.getElementById('status-indicator').innerHTML = 
+                        '<span style="color: #f44336;">●</span> Proxy hors ligne';
+                });
         });
+
+        // Ajout de styles CSS pour animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            
+            .download-btn {
+                transition: all 0.3s ease;
+            }
+            
+            .download-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+            
+            #status-indicator {
+                font-size: 12px;
+                margin-left: 10px;
+                font-weight: normal;
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 
