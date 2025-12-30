@@ -1,4 +1,4 @@
-name = "photography-studio-backend"
+name = "photographys-tudio"
 main = "src/index.js"
 compatibility_date = "2024-12-27"
 compatibility_flags = [ "nodejs_compat" ]
